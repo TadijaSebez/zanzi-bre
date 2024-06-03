@@ -1,3 +1,4 @@
+import EditNote from "./EditNote"
 import "./HomePage.css"
 import NotesList from "./NotesList"
 
@@ -18,9 +19,8 @@ export default function HomePage() {
                 </div>
                 <NotesList/>
             </div>
-            <div className="">
-
-            </div>
+            <EditNote/>
+            
         </div>
     )
 }

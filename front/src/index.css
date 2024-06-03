@@ -35,7 +35,7 @@ code {
 
 	--card-radius: 20px;
 	--inner-card-radius: 12px;
-	--input-radius: 24px;
+	--input-radius: 12px;
 
 	--standard-padding: 48px;
 	--font-fam: 'DM Sans'
@@ -521,7 +521,7 @@ button:active {
 
 .outline-button {
 	height: 40px;
-	border: rgba(var(--on-background), 40%) 2px solid;
+	border: rgba(var(--on-background), 22%) 2px solid;
 	background-color: transparent;
 }
 
@@ -537,10 +537,16 @@ button:active {
 	font-size: 0.89em;
 }
 
+.surface-button {
+	background-color: rgba(var(--primary-light), 7%);
+	letter-spacing: 0.09em;
+	font-size: 0.89em;
+}
+
 .text-button:not(.text-button-selected):hover,
-.icon-button:hover {
+.icon-button:hover, .surface-button:hover {
 	background-color: rgba(var(--primary-light), 0.15);
-	color: var(--on-primary-light);
+	color: var(--primary-light);
 }
 
 .text-button-selected {
@@ -938,7 +944,7 @@ textarea {
 .solid-chip {
     background-color: rgba(var(--accent), 40%);
 	color: rgba(var(--on-background), 85%);
-	border-radius: var(--input-radius);
+	border-radius: 20px;
 	height: 40px;
 	letter-spacing: 0.1em;
 	font-size: 0.9em;

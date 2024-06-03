@@ -40,3 +40,12 @@
     background-color: rgba(var(--neutral), 5%);
 	color: rgba(var(--on-background), 55%);
 }
+
+/* Edit Note */
+.edit-note-wrapper {
+    height: calc(100% - 24px);
+    margin: 12px 12px 12px 0;
+}
+.edit-note-wrapper .input-wrapper {
+    height: 40px;
+}
