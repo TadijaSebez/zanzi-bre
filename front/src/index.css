@@ -159,11 +159,12 @@ p {
 
 .section-title {
 	font-size: 1.65rem;
-	font-weight: 100;
+	font-weight: 200;
 	margin-bottom: 12px;
 	margin-left: 4px;
 	letter-spacing: unset;
     font-weight: 200;
+    letter-spacing: 0.05rem;
 }
 
 .bold {
@@ -172,8 +173,9 @@ p {
 
 .page-title {
 	font-size: 2rem;
-	font-weight: 100;
+	font-weight: 200;
 	padding: 22px 0;
+    letter-spacing: 0.05rem;
 }
 
 .hero-title {
