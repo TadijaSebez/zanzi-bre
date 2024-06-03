@@ -404,7 +404,7 @@ p {
 	background-color: rgb(var(--surface));
 	border-radius: var(--card-radius);
 	padding: 16px 14px;
-	box-shadow: rgba(10, 10, 26, 0.4) 0px 0px 13px;
+	box-shadow: rgba(10, 10, 26, 0.1) 0px 0px 13px;
 }
 
 .data-grid {
@@ -453,14 +453,17 @@ p {
 }
 
 .shadow {
-	box-shadow: rgba(17, 17, 26, 0.19) 0px 0px 16px;
+	box-shadow: rgba(17, 17, 26, 0.1) 0px 0px 16px;
+}
+.shadow-elevated {
+	box-shadow: rgba(10, 10, 26, 0.16) 0px 0px 20px;
 }
 
 .dashed-card {
 	min-width: 260px;
 	border-radius: var(--card-radius);
-	border: 2px dashed rgb(var(--neutral-half));
-	padding: 24px;
+	border: 2px dashed rgba(var(--neutral), 50%);
+	padding: 28px 20px;
 }
 
 /* ------------------------------------------------------------------------------------------------------ Buttons */
@@ -658,6 +661,10 @@ button:active {
 
 .input-icon {
 	color: rgba(var(--on-background), 0.2);
+}
+
+.small-icon {
+    font-size: 1.2rem;
 }
 
 .regular-border {
@@ -929,12 +936,11 @@ textarea {
 
 /* ------------------------------------------------------------------------------------------------------ Chips */
 .solid-chip {
-    background-color: rgba(var(--neutral), 50%);
+    background-color: rgba(var(--accent), 40%);
 	color: rgba(var(--on-background), 85%);
 	border-radius: var(--input-radius);
 	height: 40px;
 	letter-spacing: 0.1em;
-	text-transform: uppercase;
 	font-size: 0.9em;
 	user-select: none;
 	font-family: "Roboto";
@@ -962,6 +968,10 @@ textarea {
 	user-select: none;
 	font-weight: 500;
 	padding: 0 12px;
+}
+.small-chip {
+    height: 32px;
+    padding: 0 8px;
 }
 /* ------------------------------------------------------------------------------------------------------ Scrollable */
 .scrollable {

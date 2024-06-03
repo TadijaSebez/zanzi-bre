@@ -1,0 +1,42 @@
+/* Home */
+.home-wrapper {
+    display: grid;
+    grid-template-columns: 30% 70%;
+    height: 100vh;
+}
+.notes-column {
+    padding-top: 64px;
+    margin-top: 24px;
+}
+.main-header {
+    position: fixed;
+    top: 0;
+    margin: 12px;
+    width: calc(30% - 24px);
+    z-index: 100;
+}
+
+/* Note list */
+.note-peek {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+.tr-chip {
+    position: absolute;
+    top: 4.5px;
+    right: 3px;
+    scale: 0.95;
+}
+.owner-chip {
+    background-color: rgba(var(--primary-light), 10%);
+	color: rgba(var(--primary-dark), 85%);
+}
+.editor-chip {
+    background-color: rgba(var(--accent), 10%);
+    color: rgba(var(--primary-light), 85%);
+}
+.viewer-chip {
+    background-color: rgba(var(--neutral), 5%);
+	color: rgba(var(--on-background), 55%);
+}
