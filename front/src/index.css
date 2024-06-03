@@ -121,7 +121,7 @@ p {
 
 .card-label {
 	font-weight: 400;
-	font-size: 1rem;
+	font-size: 0.75rem;
 }
 
 .key-item {
@@ -169,6 +169,9 @@ p {
 
 .bold {
 	font-weight: 600;
+}
+.medium {
+    font-weight: 500;
 }
 
 .page-title {
@@ -484,6 +487,15 @@ button {
 	color: rgba(var(--on-background), 85%);
 }
 
+.button-text {
+	text-transform: uppercase;
+	font-size: 0.95em;
+	user-select: none;
+	font-family: "Roboto";
+	font-weight: 500;
+	letter-spacing: 0.1em;
+}
+
 button:active {
 	scale: 0.98;
 }
@@ -628,6 +640,7 @@ button:active {
 
 .small-icon-button {
 	height: 36px;
+    border-radius: var(--input-radius);
 }
 
 .disabled-solid-button,
@@ -944,7 +957,7 @@ textarea {
 .solid-chip {
     background-color: rgba(var(--accent), 40%);
 	color: rgba(var(--on-background), 85%);
-	border-radius: 20px;
+	border-radius: var(--input-radius);
 	height: 40px;
 	letter-spacing: 0.1em;
 	font-size: 0.9em;
@@ -965,8 +978,8 @@ textarea {
 	padding: 0 12px;
 }
 .info-chip {
-    background-color: rgb(var(--primary-dark));
-	color: rgba(var(--on-primary-dark), 95%);
+    background-color: rgba(var(--primary-dark), 10%);
+	color: rgba(var(--primary-dark), 95%);
 	border-radius: var(--input-radius);
 	min-height: 40px;
 	letter-spacing: 0.01em;

@@ -1,6 +1,6 @@
 import { useState } from "react"
 
-export default function EditNote() {
+export default function EditNote({onShareCallback}) {
     const [title, setTitle] = useState("")
     const [content, setContent] = useState("")
 
@@ -11,7 +11,7 @@ export default function EditNote() {
                         <span className="material-symbols-outlined icon input-icon">titlecase</span>
                         <input placeholder="Note Title" value={title} onChange={(e) => setTitle(e.target.value)}/>
                     </div>
-                    <button className="surface-button gap-xs flex center">
+                    <button className="surface-button gap-xs flex center" onClick={() => onShareCallback(undefined)}>
                         <span className="material-symbols-outlined icon small-icon">share</span>
                         Share
                     </button>

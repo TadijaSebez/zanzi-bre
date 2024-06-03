@@ -49,3 +49,32 @@
 .edit-note-wrapper .input-wrapper {
     height: 40px;
 }
+
+/* Share */
+.shared-with-chip {
+    position: relative;
+    transition: all 0.05s ease-in-out;
+    background-color: rgba(var(--neutral), 20%);
+}
+.shared-with-chip:hover {
+    cursor: pointer;
+    scale: 1.025;
+    background-color: rgba(var(--error), 85%);
+}
+.shared-with-chip .main-content {
+    transition: all 0.08s ease-in-out;
+}
+.shared-with-chip:hover .main-content {
+    opacity: 0;
+}
+.shared-with-chip .secondary-content {
+    position: absolute;
+    top: 0;
+    opacity: 0;
+    transition: all 0.08s ease-in-out;
+    color: rgb(var(--on-primary-light))
+}
+.shared-with-chip:hover .secondary-content {
+    opacity: 1;
+    color: rgb(var(--on-error))
+}
