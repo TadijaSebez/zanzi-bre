@@ -50,7 +50,7 @@ export default function ShareSlideOut({popup}) {
         setPendingShare([])
     }
 
-    const premissionLevels = [{label: 'Editors', value: 0}, {label: 'Viewers', value: 1}]
+    const premissionLevels = [ {label: 'Viewers', value: 0}, {label: 'Editors', value: 1}]
 
 
     useEffect(() => {
@@ -110,7 +110,7 @@ export default function ShareSlideOut({popup}) {
                             <span className="material-symbols-outlined icon input-icon">email</span>
                             <input placeholder="Email" value={pendingEmail} onChange={(e) => setPendingEmail(e.target.value)} onKeyUp={handleEnterPress}/>
                         </div>
-                        <DropDownSelect icon={'supervisor_account'} placeholder={'Premission'} options={premissionLevels} callback={(val) => setPendingAs(val)}/>
+                        <DropDownSelect icon={'supervisor_account'} placeholder={'Premission'} options={premissionLevels} callback={(val) => setPendingAs(val)} initialValue={0}/>
                     </div>
                     <div className="flex wrap center gap-xxs v-spacer-s">
                         {pendingShare.map(pending => {return(

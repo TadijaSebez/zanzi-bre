@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react"
 import { usePopup } from "../../components/pop-up/PopUpFrame"
 import EditNote from "./EditNote"
 import "./HomePage.css"
@@ -12,6 +13,34 @@ export default function HomePage() {
         sharePopup.showPopup(note)
     }
 
+    const [notes, setNotes] = useState([])
+    const fetchNotes = () => {
+        let temp = []
+        for(let i = 1; i <= 20; i++) {
+            temp.push({
+                id: i,
+                title: "Note " + i, 
+                content: "This an example of the Note! This one is a lot longer so we can see how does the thingy work",
+                premission: i < 10 ? 'OWNER' : i < 15 ? 'EDITOR' : 'VIEWER'
+            })
+        }
+        setNotes(temp)
+    }
+    useEffect(() => fetchNotes(), [])
+
+    const [noteInFocuse, setNoteInFocuse] = useState(undefined)
+    const saveNote = (note) => {
+        setNoteInFocuse(undefined)
+    }
+    const newNote = () => {
+        setNoteInFocuse({
+            id: null,
+            title: '', 
+            content: '',
+            premission: 'OWNER'
+        })
+    }
+
     return(
         <div className="home-wrapper">
             <div className="notes-column silent-scroll">
@@ -22,9 +51,9 @@ export default function HomePage() {
                         <span className="material-symbols-outlined icon">logout</span>
                     </button>
                 </div>
-                <NotesList/>
+                <NotesList notes={notes} inFocuse={noteInFocuse} onNoteEdit={(note) => setNoteInFocuse(note)}/>
             </div>
-            <EditNote onShareCallback={handleShare}/>
+            <EditNote onShareCallback={handleShare} inFocuse={noteInFocuse} onSaveCallback={saveNote} onNewNoteRequested={newNote}/>
             <ShareSlideOut popup={sharePopup}/>
         </div>
     )
