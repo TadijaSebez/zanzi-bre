@@ -26,11 +26,15 @@ export default function HomePage() {
         }
         setNotes(temp)
     }
-    useEffect(() => fetchNotes(), [])
+    // useEffect(() => fetchNotes(), [])
 
     const [noteInFocuse, setNoteInFocuse] = useState(undefined)
     const saveNote = (note) => {
         setNoteInFocuse(undefined)
+        if(note.id == null) {
+            note.id = notes.length
+            setNotes(prev => [...prev, note])
+        }
     }
     const newNote = () => {
         setNoteInFocuse({
@@ -39,6 +43,9 @@ export default function HomePage() {
             content: '',
             premission: 'OWNER'
         })
+    }
+    const discard = () => {
+        setNoteInFocuse(undefined)
     }
 
     return(
@@ -53,7 +60,7 @@ export default function HomePage() {
                 </div>
                 <NotesList notes={notes} inFocuse={noteInFocuse} onNoteEdit={(note) => setNoteInFocuse(note)}/>
             </div>
-            <EditNote onShareCallback={handleShare} inFocuse={noteInFocuse} onSaveCallback={saveNote} onNewNoteRequested={newNote}/>
+            <EditNote onShareCallback={handleShare} inFocuse={noteInFocuse} onSaveCallback={saveNote} onNewNoteRequested={newNote} onDiscardCallback={discard}/>
             <ShareSlideOut popup={sharePopup}/>
         </div>
     )

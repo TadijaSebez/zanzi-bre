@@ -7,15 +7,19 @@ export default function ShareSlideOut({popup}) {
     const [sharedWith, setSharedWith] = useState([])
     const fetchSharedWith = () => {
         // TODO Fetch
-        let temp = []
-        for(let i = 1; i < 6; i++) {
-            temp.push({
-                name: 'Name Surname',
-                email: 'user' + i + '@email.com',
-                premission: i < 3 ? 'EDITOR' : 'VIEWER'
-            })
-        }
-        setSharedWith(temp)
+        // let temp = []
+        // for(let i = 1; i < 6; i++) {
+        //     temp.push({
+        //         name: 'Name Surname',
+        //         email: 'user' + i + '@email.com',
+        //         premission: i < 3 ? 'EDITOR' : 'VIEWER'
+        //     })
+        // }
+        // setSharedWith(temp)
+    }
+    const removeAlreadyShared = (share) => {
+        // TODO Send premissions removed
+        setSharedWith((prev) => prev.filter(item => item.email != share.email))
     }
 
 
@@ -86,7 +90,7 @@ export default function ShareSlideOut({popup}) {
                         <p className="card-title v-spacer-xs hi-spacer-xs">Shared With</p>
                         <div className="flex wrap gap-xxs center v-spacer-l">
                             {sharedWith.map(user => {return(
-                                <div className="solid-chip shared-with-chip" style={{height:'48px'}}>
+                                <div className="solid-chip shared-with-chip" style={{height:'48px'}} onClick={() => removeAlreadyShared(user)}>
                                     <div className="flex center gap-xs main-content main-content h-100">
                                         <span className="material-symbols-outlined icon small-icon">{user.premission == 'EDITOR'? 'edit' : 'visibility'}</span>
                                         <div className="h-spacer-xs">
