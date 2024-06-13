@@ -22,25 +22,23 @@ jobs:
         run: npm run build
         env:
           CI: false
-      # - run: npm run test
+      # - name: Run React tests
+      #   run: npm run test
   
   build-back:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        go-version: [ '1.19', '1.20', '1.21.x' ]
     defaults:
       run:
         working-directory: back
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Go ${{ matrix.go-version }}
+      - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: ${{ matrix.go-version }}
+          go-version: '1.21.x'
       - name: Display Go version
         run: go version
-      - name: Install dependencies
-        run: go get -u all
+      # - name: Install dependencies
+      #   run: go get -u all
       - name: Build Go project
         run: go build
