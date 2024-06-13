@@ -6,8 +6,8 @@ jobs:
     defaults:
       run:
         working-directory: front
-        env:
-          CI: false
+      env:
+        CI: false
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
