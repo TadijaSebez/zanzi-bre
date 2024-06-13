@@ -6,8 +6,6 @@ jobs:
     defaults:
       run:
         working-directory: front
-      env:
-        CI: false
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -17,4 +15,6 @@ jobs:
       - run: npm --version
       - run: npm i
       - run: npm run build
+        env:
+          CI: false
       - run: npm run test
