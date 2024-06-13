@@ -8,13 +8,39 @@ jobs:
         working-directory: front
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Setup node
+        uses: actions/setup-node@v3
         with:
           node-version: '18'
-      - run: node --version
-      - run: npm --version
-      - run: npm i
-      - run: npm run build
+      - name: Display node version
+        run: node --version
+      - name: Display npm version
+        run: npm --version
+      - name: Install dependencies
+        run: npm i
+      - name: Build React project
+        run: npm run build
         env:
           CI: false
       # - run: npm run test
+  
+  build-back:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version: [ '1.19', '1.20', '1.21.x' ]
+    defaults:
+      run:
+        working-directory: back
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Go ${{ matrix.go-version }}
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go-version }}
+      - name: Display Go version
+        run: go version
+      - name: Install dependencies
+        run: go get -u all
+      - name: Build Go project
+        run: go build
