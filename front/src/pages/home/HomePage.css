@@ -1,0 +1,80 @@
+/* Home */
+.home-wrapper {
+    display: grid;
+    grid-template-columns: 30% 70%;
+    height: 100vh;
+}
+.notes-column {
+    padding-top: 64px;
+    margin-top: 24px;
+}
+.main-header {
+    position: fixed;
+    top: 0;
+    margin: 12px;
+    width: calc(30% - 24px);
+    z-index: 100;
+}
+
+/* Note list */
+.note-peek {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+.tr-chip {
+    position: absolute;
+    top: 4.5px;
+    right: 3px;
+    scale: 0.95;
+}
+.owner-chip {
+    background-color: rgba(var(--primary-light), 10%);
+	color: rgba(var(--primary-dark), 85%);
+}
+.editor-chip {
+    background-color: rgba(var(--accent), 10%);
+    color: rgba(var(--primary-light), 85%);
+}
+.viewer-chip {
+    background-color: rgba(var(--neutral), 5%);
+	color: rgba(var(--on-background), 55%);
+}
+
+/* Edit Note */
+.edit-note-wrapper {
+    height: calc(100% - 24px);
+    margin: 12px 12px 12px 0;
+}
+.edit-note-wrapper .input-wrapper {
+    height: 40px;
+}
+
+/* Share */
+.shared-with-chip {
+    position: relative;
+    transition: all 0.05s ease-in-out;
+    background-color: rgba(var(--neutral), 20%);
+}
+.shared-with-chip:hover {
+    cursor: pointer;
+    scale: 1.025;
+    background-color: rgba(var(--error), 85%);
+}
+.shared-with-chip .main-content {
+    transition: all 0.08s ease-in-out;
+}
+.shared-with-chip:hover .main-content {
+    opacity: 0;
+}
+.shared-with-chip .secondary-content {
+    position: absolute;
+    top: 0;
+    opacity: 0;
+    transition: all 0.08s ease-in-out;
+    color: rgb(var(--on-primary-light))
+}
+.shared-with-chip:hover .secondary-content {
+    opacity: 1;
+    color: rgb(var(--on-error))
+}
