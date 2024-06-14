@@ -1,0 +1,22 @@
+{
+    "tasks": [
+        {
+            "name": "MoveTo"
+        },
+        {
+            "name": "LineTo"
+        },
+        {
+            "name": "LineTo"
+        },
+        {
+            "name": "MoveBy"
+        },
+        {
+            "name": "Circle"
+        },
+        {
+            "name": "LineTo"
+        }
+    ]
+}
