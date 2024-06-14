@@ -89,6 +89,20 @@ odnos {
 }
 """
 
+def model_to_dict(model):
+    return {
+        "namespace": model.namespace,
+        "relations": [{
+           "name": relation.relationName,
+           "additional": [{ 
+                "type": t.__class__.__name__,
+                "children": [{
+                    "child": "this" if child.this is not None else child.existingRelation.relationName
+                } for child in t.children]
+           } for t in relation.additionalInfo.type] if relation.additionalInfo is not None else {}
+        } for relation in model.relations]
+    }
+
 if __name__=="__main__":
     mm = metamodel_from_str(grammar)
     model = mm.model_from_str(model_str)
@@ -98,3 +112,6 @@ if __name__=="__main__":
 
     for relation in model.relations:
         print(relation.relationName)
+
+    model_dict = model_to_dict(model)
+    print(json.dumps(model_dict))
