@@ -1,0 +1,56 @@
+Model:
+    'ime' ':' namespace=STRING    
+    relations*=Relation
+;
+
+Relation:
+    'odnos' '{'
+        'ime' ':' relationName=STRING
+        (additionalInfo=AdditionalInfo)?
+    '}'
+;
+
+AdditionalInfo:
+    'dodatak' '{'
+        type+=Type
+    '}'
+;
+
+Union:
+    'bilo_koji' '{'
+        children+=Child
+    '}'
+;
+
+Intersection:
+    'svaki' '{'
+        children+=Child
+    '}'
+;
+
+Exclusion:
+    'jedan_od' '{'
+        children+=Child
+    '}'
+;
+
+Child:
+    'dete' '{'
+        ( this=This
+        | existingRelation=ExistingRelation)
+    '}'
+;
+
+This:
+    'ovaj' '{}'
+;
+
+ExistingRelation:
+    'postojeci_odnos' '{' 
+        'odnos' ':' relationName=STRING
+    '}'
+;
+
+Type:
+    Union | Intersection | Exclusion
+;

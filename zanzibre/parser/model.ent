@@ -1,0 +1,25 @@
+ime: "doc"
+
+odnos { 
+    ime: "owner" 
+}
+
+odnos {
+    ime: "editor"
+    dodatak {
+        bilo_koji {
+            dete { ovaj {} }
+            dete { postojeci_odnos { odnos: "owner" } }
+        }
+    }
+}
+
+odnos {
+    ime: "viewer"
+    dodatak {
+        svaki {
+            dete { ovaj {} }
+            dete { postojeci_odnos { odnos: "editor" } }
+        }
+    }
+}
