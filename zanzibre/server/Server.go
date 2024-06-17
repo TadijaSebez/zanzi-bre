@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"log"
+	"placeholder/zanzibar/core"
 	"strconv"
 
 	"github.com/labstack/echo/v4"
@@ -13,11 +14,18 @@ type Server struct {
 	Port   string
 	Ip     string
 	DbPath string
+	Engine *core.Engine
 }
 
 type CustomContext struct {
 	echo.Context
 	Server *Server
+}
+
+type Acl struct {
+	Object   string
+	Relation string
+	User     string
 }
 
 func newRouter(s *Server) *echo.Echo {
@@ -37,10 +45,13 @@ func newRouter(s *Server) *echo.Echo {
 	e.GET("/put", dbPutTest)
 	e.GET("/get", dbGetTest)
 
+	e.POST("/acl", putAcl)
+	//e.POST("/acl/check", getAcl)
+
 	return e
 }
 
-func New(ip string, port int, dbPath string) (*Server, error) {
+func New(ip string, port int, dbPath string, engine *core.Engine) (*Server, error) {
 	if port < 1000 || port > 65535 {
 		return nil, fmt.Errorf("invalid port value")
 	}
@@ -49,6 +60,7 @@ func New(ip string, port int, dbPath string) (*Server, error) {
 		Port:   strconv.Itoa(port),
 		Ip:     ip,
 		DbPath: dbPath,
+		Engine: engine,
 	}
 
 	return server, nil

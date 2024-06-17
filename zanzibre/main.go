@@ -8,19 +8,20 @@ import (
 )
 
 func main() {
-	port := flag.Int("p", 6969, "Port number in range [1000, 65535]. Default is 6969")
-	ip := flag.String("ip", "127.0.0.1", "IP address on which to serve. Default is 127.0.0.1")
-	dbPath := flag.String("db", "zanzibase", "Path to the LevelDB folder. Default is ./zanzibase")
+	port := flag.Int("p", 6969, "Port number in range [1000, 65535].")
+	ip := flag.String("ip", "127.0.0.1", "IP address on which to serve.")
+	dbPath := flag.String("db", "zanzibase", "Path to the LevelDB folder.")
+	templatePath := flag.String("t", "parser/template.json", "Path to the dsl template.")
 
 	flag.Parse()
 
-	server, err := server.New(*ip, *port, *dbPath)
+	engine, err := core.NewEngine(*templatePath)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	engine, err := core.NewEngine("parser/template.json")
+	server, err := server.New(*ip, *port, *dbPath, engine)
 
 	if err != nil {
 		log.Fatal(err)
