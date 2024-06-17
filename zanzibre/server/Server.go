@@ -5,15 +5,31 @@ import (
 	"strconv"
 
 	"github.com/labstack/echo/v4"
+	"github.com/syndtr/goleveldb/leveldb"
 )
 
 type Server struct {
-	Port   string
-	Router *echo.Echo
+	Port string
 }
 
-func newRouter() *echo.Echo {
+type CustomContext struct {
+	echo.Context
+	Server *Server
+}
+
+func newRouter(s *Server) *echo.Echo {
 	e := echo.New()
+
+	// Middleware
+	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			cc := &CustomContext{
+				Context: c,
+				Server:  s,
+			}
+			return next(cc)
+		}
+	})
 
 	e.GET("/put", dbPutTest)
 	e.GET("/get", dbGetTest)
@@ -26,16 +42,44 @@ func New(port int) (*Server, error) {
 		return nil, fmt.Errorf("invalid port value")
 	}
 
-	router := newRouter()
-
 	server := &Server{
-		Port:   strconv.Itoa(port),
-		Router: router,
+		Port: strconv.Itoa(port),
 	}
 
 	return server, nil
 }
 
 func (s *Server) Serve() {
-	s.Router.Start("localhost:" + s.Port)
+	router := newRouter(s)
+	router.Start("localhost:" + s.Port)
+}
+
+func dbPut(key, value []byte) error {
+	// TODO: Load db name from file?
+	db, err := leveldb.OpenFile("zanzibase", nil)
+
+	if err != nil {
+		return err
+	}
+
+	defer db.Close()
+
+	err = db.Put(key, value, nil)
+
+	return err
+}
+
+func dbGet(key []byte) ([]byte, error) {
+	// TODO: Load db name from file?
+	db, err := leveldb.OpenFile("zanzibase", nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer db.Close()
+
+	value, err := db.Get(key, nil)
+
+	return value, err
 }

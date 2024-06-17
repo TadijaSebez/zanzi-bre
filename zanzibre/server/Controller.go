@@ -1,44 +1,37 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"github.com/syndtr/goleveldb/leveldb"
 )
 
 func dbPutTest(c echo.Context) error {
-	db, err := leveldb.OpenFile("zanzibase", nil)
+	key := "key"
+	value := "value"
+
+	err := dbPut([]byte(key), []byte(value))
 
 	if err != nil {
-		return err
+		return c.JSON(http.StatusNotFound, map[string]string{
+			"error": err.Error(),
+		})
 	}
 
-	defer db.Close()
-
-	err = db.Put([]byte("key"), []byte("value"), nil)
-
-	if err != nil {
-		return err
-	}
-
-	return c.String(http.StatusOK, "Successful put")
+	return c.String(http.StatusOK, fmt.Sprintf("%s: %s", key, value))
 }
 
 func dbGetTest(c echo.Context) error {
-	db, err := leveldb.OpenFile("zanzibase", nil)
+	key := "key"
+
+	value, err := dbGet([]byte(key))
 
 	if err != nil {
-		return err
+		return c.JSON(http.StatusNotFound, map[string]string{
+			"error": err.Error(),
+		})
 	}
 
-	defer db.Close()
-
-	val, err := db.Get([]byte("key"), nil)
-
-	if err != nil {
-		return err
-	}
-
-	return c.String(http.StatusOK, string(val))
+	return c.String(http.StatusOK, string(value))
 }
