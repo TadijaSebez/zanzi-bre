@@ -1,7 +1,16 @@
 package main
 
-import "fmt"
+import (
+	"log"
+	"placeholder/zanzibar/server"
+)
 
 func main() {
-	fmt.Println("Hello world!")
+	server, err := server.New(6969)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	server.Serve()
 }
