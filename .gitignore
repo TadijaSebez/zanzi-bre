@@ -2,4 +2,7 @@
 .vscode/*
 .idea/
 .idea/*
+
 zanzibre/parser/*.json
+zanzibre/zanzibase/*
+zanzibre/zanzibase/
