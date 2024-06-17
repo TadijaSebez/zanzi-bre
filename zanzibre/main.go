@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"log"
+	"placeholder/zanzibar/core"
 	"placeholder/zanzibar/server"
 )
 
@@ -19,5 +20,12 @@ func main() {
 		log.Fatal(err)
 	}
 
+	engine, err := core.NewEngine("parser/template.json")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	engine.PrintTemplate()
 	server.Serve()
 }
