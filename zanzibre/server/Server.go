@@ -42,9 +42,6 @@ func newRouter(s *Server) *echo.Echo {
 		}
 	})
 
-	e.GET("/put", dbPutTest)
-	e.GET("/get", dbGetTest)
-
 	e.POST("/acl", putAcl)
 	//e.POST("/acl/check", getAcl)
 
