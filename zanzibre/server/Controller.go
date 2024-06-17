@@ -11,7 +11,10 @@ func dbPutTest(c echo.Context) error {
 	key := "key"
 	value := "value"
 
-	err := dbPut([]byte(key), []byte(value))
+	cc := c.(*CustomContext)
+	s := cc.Server
+
+	err := s.dbPut([]byte(key), []byte(value))
 
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{
@@ -25,7 +28,10 @@ func dbPutTest(c echo.Context) error {
 func dbGetTest(c echo.Context) error {
 	key := "key"
 
-	value, err := dbGet([]byte(key))
+	cc := c.(*CustomContext)
+	s := cc.Server
+
+	value, err := s.dbGet([]byte(key))
 
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{

@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"log"
 	"strconv"
 
 	"github.com/labstack/echo/v4"
@@ -9,7 +10,9 @@ import (
 )
 
 type Server struct {
-	Port string
+	Port   string
+	Ip     string
+	DbPath string
 }
 
 type CustomContext struct {
@@ -37,13 +40,15 @@ func newRouter(s *Server) *echo.Echo {
 	return e
 }
 
-func New(port int) (*Server, error) {
+func New(ip string, port int, dbPath string) (*Server, error) {
 	if port < 1000 || port > 65535 {
 		return nil, fmt.Errorf("invalid port value")
 	}
 
 	server := &Server{
-		Port: strconv.Itoa(port),
+		Port:   strconv.Itoa(port),
+		Ip:     ip,
+		DbPath: dbPath,
 	}
 
 	return server, nil
@@ -51,12 +56,12 @@ func New(port int) (*Server, error) {
 
 func (s *Server) Serve() {
 	router := newRouter(s)
-	router.Start("localhost:" + s.Port)
+	url := fmt.Sprintf("%s:%s", s.Ip, s.Port)
+	log.Fatal(router.Start(url))
 }
 
-func dbPut(key, value []byte) error {
-	// TODO: Load db name from file?
-	db, err := leveldb.OpenFile("zanzibase", nil)
+func (s *Server) dbPut(key, value []byte) error {
+	db, err := leveldb.OpenFile(s.DbPath, nil)
 
 	if err != nil {
 		return err
@@ -69,9 +74,8 @@ func dbPut(key, value []byte) error {
 	return err
 }
 
-func dbGet(key []byte) ([]byte, error) {
-	// TODO: Load db name from file?
-	db, err := leveldb.OpenFile("zanzibase", nil)
+func (s *Server) dbGet(key []byte) ([]byte, error) {
+	db, err := leveldb.OpenFile(s.DbPath, nil)
 
 	if err != nil {
 		return nil, err
