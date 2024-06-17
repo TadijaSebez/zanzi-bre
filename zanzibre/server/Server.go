@@ -37,5 +37,5 @@ func New(port int) (*Server, error) {
 }
 
 func (s *Server) Serve() {
-	s.Router.Start(":" + s.Port)
+	s.Router.Start("localhost:" + s.Port)
 }
