@@ -15,7 +15,8 @@ type Server struct {
 func newRouter() *echo.Echo {
 	e := echo.New()
 
-	e.GET("/", dummyGet)
+	e.GET("/put", dbPutTest)
+	e.GET("/get", dbGetTest)
 
 	return e
 }
