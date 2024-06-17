@@ -11,7 +11,7 @@ def model_to_dict(model):
                 "children": [{
                     "child": "this" if child.this is not None else child.existingRelation.relationName
                 } for child in t.children]
-           } for t in relation.additionalInfo.type] if relation.additionalInfo is not None else {}
+           } for t in relation.additionalInfo.type] if relation.additionalInfo is not None else [{}]
         } for relation in model.relations]
     }
 
