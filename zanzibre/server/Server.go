@@ -43,7 +43,7 @@ func newRouter(s *Server) *echo.Echo {
 	})
 
 	e.POST("/acl", putAcl)
-	//e.POST("/acl/check", getAcl)
+	e.GET("/acl/check", getAcl)
 
 	return e
 }

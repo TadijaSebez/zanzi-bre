@@ -29,3 +29,30 @@ func putAcl(c echo.Context) error {
 
 	return c.String(http.StatusOK, key)
 }
+
+func getAcl(c echo.Context) error {
+	cc := c.(*CustomContext)
+	s := cc.Server
+
+	o := c.QueryParam("object")
+	r := c.QueryParam("relation")
+	u := c.QueryParam("user")
+
+	if o == "" || r == "" || u == "" {
+		return c.JSON(http.StatusNotFound, map[string]string{
+			"error": "expected query parameters object, relation, user.",
+		})
+	}
+
+	key := fmt.Sprintf("%s#%s@%s", o, r, u)
+	_, err := s.dbGet([]byte(key))
+
+	var value string = "true"
+	if err != nil {
+		value = "false"
+	}
+
+	return c.JSON(http.StatusNotFound, map[string]string{
+		"authorized": value,
+	})
+}
