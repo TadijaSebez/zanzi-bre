@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
@@ -44,15 +45,10 @@ func getAcl(c echo.Context) error {
 		})
 	}
 
-	key := fmt.Sprintf("%s#%s@%s", o, r, u)
-	_, err := s.dbGet([]byte(key))
-
-	var value string = "true"
-	if err != nil {
-		value = "false"
-	}
+	isOk := s.checkAcl(o, r, u)
+	value := strconv.FormatBool(isOk)
 
 	return c.JSON(http.StatusNotFound, map[string]string{
-		"authorized": value,
+		"authorized": string(value),
 	})
 }
