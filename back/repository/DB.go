@@ -3,7 +3,6 @@ package repository
 import (
 	"database/sql"
 	"fmt"
-	"log"
 
 	_ "github.com/lib/pq"
 )
@@ -30,7 +29,7 @@ func New() *DB {
 	return db
 }
 
-func (d *DB) CreateTables() {
+func (d *DB) CreateTables() error {
 	db, err := sql.Open("postgres", d.ConnString)
 
 	if err != nil {
@@ -41,7 +40,5 @@ func (d *DB) CreateTables() {
 	table := "Note(id SERIAL PRIMARY KEY, title VARCHAR(255) NOT NULL, content TEXT NOT NULL);"
 	_, err = db.Exec(fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s", table))
 
-	if err != nil {
-		log.Fatal("failed to create table with error message ", err.Error())
-	}
+	return err
 }
