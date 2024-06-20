@@ -111,13 +111,13 @@ func (s *Server) checkAcl(object, relation, user string) bool {
 		return false
 	}
 
-	return evaluateRelation(s, template, r, object, user)
+	return s.evaluateRelation(template, r, object, user)
 }
 
-func evaluateRelation(s *Server, template *core.Model, relation *core.Relation, object, user string) bool {
+func (s *Server) evaluateRelation(template *core.Model, relation *core.Relation, object, user string) bool {
 	// If additional info is 0 that means the relation looks like { name: "owner" }
 	if len(relation.AdditionalInfo) == 0 {
-		return isInDb(s, object, relation.Name, user)
+		return s.isInDb(object, relation.Name, user)
 	}
 
 	for _, info := range relation.AdditionalInfo {
@@ -125,13 +125,13 @@ func evaluateRelation(s *Server, template *core.Model, relation *core.Relation, 
 		for _, child := range info.Children {
 			if child.RelationName == "this" {
 				// If this, add true only if in database
-				childBoolArr = append(childBoolArr, isInDb(s, object, relation.Name, user))
+				childBoolArr = append(childBoolArr, s.isInDb(object, relation.Name, user))
 			} else {
 				// for example for { relation: "editor" }
 				// it has to calculate its computed userset
 				childRelation := findRelation(template, child.RelationName)
 				if childRelation != nil {
-					childBoolArr = append(childBoolArr, evaluateRelation(s, template, childRelation, object, user))
+					childBoolArr = append(childBoolArr, s.evaluateRelation(template, childRelation, object, user))
 				} else {
 					childBoolArr = append(childBoolArr, false)
 				}
@@ -179,7 +179,7 @@ func findRelation(template *core.Model, name string) *core.Relation {
 	return nil
 }
 
-func isInDb(s *Server, object, relation, user string) bool {
+func (s *Server) isInDb(object, relation, user string) bool {
 	query := fmt.Sprintf("%s#%s@%s", object, relation, user)
 	_, err := s.dbGet([]byte(query))
 	return err == nil
