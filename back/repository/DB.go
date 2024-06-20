@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 	"fmt"
+	"placeholder/back/core"
 
 	_ "github.com/lib/pq"
 )
@@ -33,7 +34,7 @@ func (d *DB) CreateTables() error {
 	db, err := sql.Open("postgres", d.ConnString)
 
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	defer db.Close()
@@ -41,4 +42,49 @@ func (d *DB) CreateTables() error {
 	_, err = db.Exec(fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s", table))
 
 	return err
+}
+
+func (d *DB) Insert(note core.Note) (*core.Note, error) {
+	db, err := sql.Open("postgres", d.ConnString)
+
+	if err != nil {
+		panic(err)
+	}
+
+	defer db.Close()
+
+	stmt, err := db.Prepare("INSERT INTO Note (content, title) VALUES ($1, $2) RETURNING ID")
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer stmt.Close()
+
+	var id int
+	err = stmt.QueryRow(note.Content, note.Title).Scan(&id)
+
+	note.Id = id
+	return &note, err
+}
+
+func (d *DB) Update(note core.Note) (*core.Note, error) {
+	db, err := sql.Open("postgres", d.ConnString)
+
+	if err != nil {
+		panic(err)
+	}
+
+	defer db.Close()
+
+	stmt, err := db.Prepare("UPDATE Note SET content=$1, title=$2 WHERE id=$3")
+	if err != nil {
+		return nil, err
+	}
+
+	defer stmt.Close()
+
+	_, err = stmt.Exec(note.Content, note.Title, note.Id)
+
+	return &note, err
 }

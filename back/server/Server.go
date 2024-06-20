@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"log"
+	"placeholder/back/core"
 	"placeholder/back/repository"
 	"strconv"
 
@@ -58,7 +59,7 @@ func newRouter(s *Server) *echo.Echo {
 	// []Note
 	e.GET("/note:userId", getAll)
 
-	// {content, title}
+	// Note
 	e.POST("/note", save)
 
 	// {noteId, userId, permission}
@@ -74,4 +75,12 @@ func (s *Server) Serve() {
 	router := newRouter(s)
 	url := fmt.Sprintf("%s:%s", s.Ip, s.Port)
 	log.Fatal(router.Start(url))
+}
+
+func (s *Server) Save(dto core.Note) (*core.Note, error) {
+	if dto.Id == -1 {
+		return s.Db.Insert(dto)
+	}
+
+	return s.Db.Update(dto)
 }
