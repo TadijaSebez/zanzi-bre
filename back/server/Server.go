@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 type Server struct {
@@ -45,6 +46,11 @@ func New(port int, ip string) (*Server, error) {
 func newRouter(s *Server) *echo.Echo {
 	e := echo.New()
 
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"*"},
+		AllowMethods: []string{echo.GET, echo.POST},
+	}))
+
 	// Middleware
 	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
@@ -67,6 +73,12 @@ func newRouter(s *Server) *echo.Echo {
 
 	// {noteId, userId}
 	e.POST("/unshare", unshare)
+
+	// {email, password}
+	e.POST("/login", login)
+
+	// {name, email, password}
+	e.POST("/register", register)
 
 	return e
 }
