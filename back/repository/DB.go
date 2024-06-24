@@ -159,3 +159,39 @@ func (d *DB) CheckUser(user core.UserDTO) bool {
 
 	return rows.Next()
 }
+
+func (d *DB) LoginUser(dto core.LoginDTO) (*core.User, error) {
+	db, err := sql.Open("postgres", d.ConnString)
+
+	if err != nil {
+		panic(err)
+	}
+
+	defer db.Close()
+
+	query := `SELECT id, email, password, name FROM Users WHERE email = $1`
+	rows, err := db.Query(query, dto.Email)
+
+	if err != nil {
+		log.Fatalf("Error executing query: %v", err)
+	}
+
+	defer rows.Close()
+
+	if !rows.Next() {
+		return nil, fmt.Errorf("user not found")
+	}
+
+	var id int
+	var email, password, name string
+	err = rows.Scan(&id, &email, &password, &name)
+
+	u := &core.User{
+		Id:       id,
+		Name:     name,
+		Password: password,
+		Email:    email,
+	}
+
+	return u, err
+}

@@ -4,12 +4,11 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-func JwtGenerator(id int, name, username, email, key string) string {
+func JwtGenerator(u User, key string) string {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"id":       id,
-		"name":     name,
-		"username": username,
-		"email":    email,
+		"id":    u.Id,
+		"name":  u.Name,
+		"email": u.Email,
 	})
 
 	tokenString, err := token.SignedString([]byte(key))

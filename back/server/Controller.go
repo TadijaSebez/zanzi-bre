@@ -43,7 +43,37 @@ func unshare(c echo.Context) error {
 }
 
 func login(c echo.Context) error {
-	return c.String(http.StatusOK, "Hello, World!")
+	cc := c.(*CustomContext)
+	s := cc.Server
+
+	var dto core.LoginDTO
+	if err := c.Bind(&dto); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": "Invalid request",
+		})
+	}
+
+	user, err := s.Db.LoginUser(dto)
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": "wrong credentials",
+		})
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(dto.Password))
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": "wrong credentials",
+		})
+	}
+
+	token := core.JwtGenerator(*user, "secretkey")
+
+	return c.JSON(http.StatusOK, map[string]string{
+		"token": token,
+	})
 }
 
 func register(c echo.Context) error {
