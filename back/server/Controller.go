@@ -1,9 +1,13 @@
 package server
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"placeholder/back/core"
+	"strconv"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -35,11 +39,65 @@ func save(c echo.Context) error {
 }
 
 func share(c echo.Context) error {
-	return c.String(http.StatusOK, "Hello, World!")
+	cc := c.(*CustomContext)
+	s := cc.Server
+
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+
+	//email := claims["email"].(string)
+	//name := claims["name"].(string)
+	id := claims["id"].(float64)
+	idStr := strconv.FormatFloat(id, 'f', -1, 64)
+
+	var dto core.ShareDTO
+	if err := c.Bind(&dto); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": "Invalid request",
+		})
+	}
+
+	if err := s.CheckAcl(strconv.Itoa(dto.NoteId), "owner", idStr); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": "You are not the owner of this note",
+		})
+	}
+
+	payload := map[string]string{
+		"object":   fmt.Sprintf("note:%d", dto.NoteId),
+		"relation": fmt.Sprintf("relation:%s", dto.Permission),
+		"user":     fmt.Sprintf("user:%s", dto.UserId),
+	}
+
+	jsonData, err := json.Marshal(payload)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": "error creating payload",
+		})
+	}
+
+	err = s.SendAcl(jsonData)
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": "Failed to share the note",
+		})
+	}
+
+	return c.NoContent(200)
 }
 
 func unshare(c echo.Context) error {
-	return c.String(http.StatusOK, "Hello, World!")
+	//user := c.Get("user").(*jwt.Token)
+	//claims := user.Claims.(jwt.MapClaims)
+
+	//// Access claims
+	//email := claims["email"].(string)
+	//name := claims["name"].(string)
+	//id := claims["id"].(float64)
+	//idStr := strconv.FormatFloat(id, 'f', -1, 64)
+
+	return c.NoContent(200)
 }
 
 func login(c echo.Context) error {

@@ -23,3 +23,14 @@ type LoginDTO struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
+
+type ShareDTO struct {
+	NoteId     int    `json:"noteId"`
+	UserId     string `json:"userId"`
+	Permission string `json:"permission"`
+}
+
+type UnshareDTO struct {
+	NoteId int    `json:"noteId"`
+	UserId string `json:"userId"`
+}

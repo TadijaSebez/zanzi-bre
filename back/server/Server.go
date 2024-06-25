@@ -1,12 +1,17 @@
 package server
 
 import (
+	"bytes"
+	"context"
 	"fmt"
 	"log"
+	"net/http"
 	"placeholder/back/core"
 	"placeholder/back/repository"
 	"strconv"
+	"time"
 
+	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -50,6 +55,8 @@ func newRouter(s *Server) *echo.Echo {
 		AllowOrigins: []string{"*"},
 		AllowMethods: []string{echo.GET, echo.POST},
 	}))
+
+	e.Use(echojwt.JWT([]byte("secretkey")))
 
 	// Middleware
 	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
@@ -95,4 +102,48 @@ func (s *Server) Save(dto core.Note) (*core.Note, error) {
 	}
 
 	return s.Db.Update(dto)
+}
+
+func (s *Server) SendAcl(body []byte) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(time.Second*5))
+	defer cancel()
+
+	url := fmt.Sprintf("http://%s%s%s", "localhost", ":6969", "/putAcl")
+
+	var reqBody *bytes.Buffer = nil
+	if body != nil {
+		reqBody = bytes.NewBuffer(body)
+	}
+
+	req, err := http.NewRequest(http.MethodGet, url, reqBody)
+	req = req.WithContext(ctx)
+
+	if err != nil {
+		return err
+	}
+
+	client := &http.Client{}
+	_, err = client.Do(req)
+
+	return err
+}
+
+func (s *Server) CheckAcl(object, relation, user string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(time.Second*5))
+	defer cancel()
+
+	endpoint := fmt.Sprintf("/check?object=note:%s&relation=%s&user=user:%s", object, relation, user)
+	url := fmt.Sprintf("http://%s%s%s", "localhost", ":6969", endpoint)
+
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	req = req.WithContext(ctx)
+
+	if err != nil {
+		return err
+	}
+
+	client := &http.Client{}
+	_, err = client.Do(req)
+
+	return err
 }

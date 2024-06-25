@@ -45,6 +45,7 @@ func newRouter(s *Server) *echo.Echo {
 
 	e.POST("/acl", putAcl)
 	e.GET("/acl/check", getAcl)
+	e.POST("/acl/delete", delAcl)
 
 	return e
 }
@@ -96,6 +97,20 @@ func (s *Server) dbGet(key []byte) ([]byte, error) {
 	value, err := db.Get(key, nil)
 
 	return value, err
+}
+
+func (s *Server) dbDel(key []byte) error {
+	db, err := leveldb.OpenFile(s.DbPath, nil)
+
+	if err != nil {
+		return err
+	}
+
+	defer db.Close()
+
+	err = db.Delete(key, nil)
+
+	return err
 }
 
 func (s *Server) checkAcl(object, relation, user string) bool {
