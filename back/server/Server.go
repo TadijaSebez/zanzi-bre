@@ -105,45 +105,41 @@ func (s *Server) Save(dto core.Note) (*core.Note, error) {
 }
 
 func (s *Server) SendAcl(body []byte) error {
+	url := fmt.Sprintf("http://%s%s%s", "localhost", ":6969", "/acl")
+	_, err := s.SendRequest(http.MethodPost, url, body)
+	return err
+}
+
+func (s *Server) DeleteAcl(body []byte) error {
+	url := fmt.Sprintf("http://%s%s%s", "localhost", ":6969", "/acl/delete")
+	_, err := s.SendRequest(http.MethodPost, url, body)
+	return err
+}
+
+func (s *Server) CheckAcl(object, relation, user string) error {
+	endpoint := fmt.Sprintf("/acl/check?object=note:%s&relation=%s&user=user:%s", object, relation, user)
+	_, err := s.SendRequest(http.MethodGet, endpoint, nil)
+	return err
+}
+
+func (s *Server) SendRequest(method, url string, body []byte) (*http.Response, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(time.Second*5))
 	defer cancel()
-
-	url := fmt.Sprintf("http://%s%s%s", "localhost", ":6969", "/putAcl")
 
 	var reqBody *bytes.Buffer = nil
 	if body != nil {
 		reqBody = bytes.NewBuffer(body)
 	}
 
-	req, err := http.NewRequest(http.MethodGet, url, reqBody)
+	req, err := http.NewRequest(method, url, reqBody)
 	req = req.WithContext(ctx)
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	client := &http.Client{}
-	_, err = client.Do(req)
+	response, err := client.Do(req)
 
-	return err
-}
-
-func (s *Server) CheckAcl(object, relation, user string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(time.Second*5))
-	defer cancel()
-
-	endpoint := fmt.Sprintf("/check?object=note:%s&relation=%s&user=user:%s", object, relation, user)
-	url := fmt.Sprintf("http://%s%s%s", "localhost", ":6969", endpoint)
-
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-	req = req.WithContext(ctx)
-
-	if err != nil {
-		return err
-	}
-
-	client := &http.Client{}
-	_, err = client.Do(req)
-
-	return err
+	return response, err
 }

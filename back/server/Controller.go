@@ -38,30 +38,40 @@ func save(c echo.Context) error {
 	return c.JSON(http.StatusOK, note)
 }
 
-func share(c echo.Context) error {
+func isOwner(c echo.Context) error {
 	cc := c.(*CustomContext)
 	s := cc.Server
 
 	user := c.Get("user").(*jwt.Token)
 	claims := user.Claims.(jwt.MapClaims)
 
-	//email := claims["email"].(string)
-	//name := claims["name"].(string)
 	id := claims["id"].(float64)
 	idStr := strconv.FormatFloat(id, 'f', -1, 64)
 
 	var dto core.ShareDTO
 	if err := c.Bind(&dto); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"error": "Invalid request",
-		})
+		return fmt.Errorf("invalid body format")
 	}
 
 	if err := s.CheckAcl(strconv.Itoa(dto.NoteId), "owner", idStr); err != nil {
+		return fmt.Errorf("you are not the owner of this note")
+	}
+
+	return nil
+}
+
+func share(c echo.Context) error {
+	cc := c.(*CustomContext)
+	s := cc.Server
+	if err := isOwner(c); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{
-			"error": "You are not the owner of this note",
+			"error": err.Error(),
 		})
 	}
+
+	// Checked in isOwner
+	var dto core.ShareDTO
+	_ = c.Bind(&dto)
 
 	payload := map[string]string{
 		"object":   fmt.Sprintf("note:%d", dto.NoteId),
@@ -88,14 +98,38 @@ func share(c echo.Context) error {
 }
 
 func unshare(c echo.Context) error {
-	//user := c.Get("user").(*jwt.Token)
-	//claims := user.Claims.(jwt.MapClaims)
+	cc := c.(*CustomContext)
+	s := cc.Server
+	if err := isOwner(c); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": err.Error(),
+		})
+	}
 
-	//// Access claims
-	//email := claims["email"].(string)
-	//name := claims["name"].(string)
-	//id := claims["id"].(float64)
-	//idStr := strconv.FormatFloat(id, 'f', -1, 64)
+	// Checked in isOwner
+	var dto core.ShareDTO
+	_ = c.Bind(&dto)
+
+	payload := map[string]string{
+		"object":   fmt.Sprintf("note:%d", dto.NoteId),
+		"relation": fmt.Sprintf("relation:%s", dto.Permission),
+		"user":     fmt.Sprintf("user:%s", dto.UserId),
+	}
+
+	jsonData, err := json.Marshal(payload)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": "error creating payload",
+		})
+	}
+
+	err = s.DeleteAcl(jsonData)
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": "Failed to delete the permissions",
+		})
+	}
 
 	return c.NoContent(200)
 }

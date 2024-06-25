@@ -29,8 +29,3 @@ type ShareDTO struct {
 	UserId     string `json:"userId"`
 	Permission string `json:"permission"`
 }
-
-type UnshareDTO struct {
-	NoteId int    `json:"noteId"`
-	UserId string `json:"userId"`
-}
