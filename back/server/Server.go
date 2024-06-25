@@ -17,9 +17,10 @@ import (
 )
 
 type Server struct {
-	Port string
-	Ip   string
-	Db   *repository.DB
+	Port     string
+	Ip       string
+	Db       *repository.DB
+	Zanzibar *core.Zanzibar
 }
 
 type CustomContext struct {
@@ -27,9 +28,13 @@ type CustomContext struct {
 	Server *Server
 }
 
-func New(port int, ip string) (*Server, error) {
+func New(port int, ip string, zanzibarPort int, zanzibarIp string) (*Server, error) {
 	if port < 1000 || port > 65535 {
 		return nil, fmt.Errorf("invalid port value")
+	}
+
+	if zanzibarPort < 1000 || zanzibarPort > 65535 {
+		return nil, fmt.Errorf("invalid zanzibar port value")
 	}
 
 	db := repository.New()
@@ -39,10 +44,16 @@ func New(port int, ip string) (*Server, error) {
 		return nil, fmt.Errorf("couldn't connect to the database")
 	}
 
+	zanzibar := &core.Zanzibar{
+		Ip:   zanzibarIp,
+		Port: fmt.Sprintf(":%s", zanzibarPort),
+	}
+
 	s := &Server{
-		Port: strconv.Itoa(port),
-		Ip:   ip,
-		Db:   db,
+		Port:     strconv.Itoa(port),
+		Ip:       ip,
+		Db:       db,
+		Zanzibar: zanzibar,
 	}
 
 	return s, nil
@@ -105,20 +116,21 @@ func (s *Server) Save(dto core.Note) (*core.Note, error) {
 }
 
 func (s *Server) SendAcl(body []byte) error {
-	url := fmt.Sprintf("http://%s%s%s", "localhost", ":6969", "/acl")
+	url := fmt.Sprintf("http://%s%s%s", s.Zanzibar.Ip, s.Zanzibar.Port, core.PutEndpoint)
 	_, err := s.SendRequest(http.MethodPost, url, body)
 	return err
 }
 
 func (s *Server) DeleteAcl(body []byte) error {
-	url := fmt.Sprintf("http://%s%s%s", "localhost", ":6969", "/acl/delete")
+	url := fmt.Sprintf("http://%s%s%s", s.Zanzibar.Ip, s.Zanzibar.Port, core.DelEndpoint)
 	_, err := s.SendRequest(http.MethodPost, url, body)
 	return err
 }
 
 func (s *Server) CheckAcl(object, relation, user string) error {
-	endpoint := fmt.Sprintf("/acl/check?object=note:%s&relation=%s&user=user:%s", object, relation, user)
-	_, err := s.SendRequest(http.MethodGet, endpoint, nil)
+	endpoint := fmt.Sprintf("http://%s%s%s", s.Zanzibar.Ip, s.Zanzibar.Port, core.CheckEndpoint)
+	url := fmt.Sprintf("%s?object=note:%s&relation=%s&user=user:%s", endpoint, object, relation, user)
+	_, err := s.SendRequest(http.MethodGet, url, nil)
 	return err
 }
 

@@ -29,3 +29,12 @@ type ShareDTO struct {
 	UserId     string `json:"userId"`
 	Permission string `json:"permission"`
 }
+
+type Zanzibar struct {
+	Ip   string
+	Port string
+}
+
+const PutEndpoint string = "/acl"
+const DelEndpoint string = "/acl/delete"
+const CheckEndpoint string = "/acl/check"
