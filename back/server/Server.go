@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"placeholder/back/core"
 	"placeholder/back/repository"
 	"strconv"
+	"strings"
 	"time"
 
 	echojwt "github.com/labstack/echo-jwt/v4"
@@ -56,6 +58,8 @@ func New(port int, ip string, zanzibarPort int, zanzibarIp string) (*Server, err
 		Zanzibar: zanzibar,
 	}
 
+	fmt.Println(s.Zanzibar.Ip, s.Zanzibar.Port)
+
 	return s, nil
 }
 
@@ -66,8 +70,6 @@ func newRouter(s *Server) *echo.Echo {
 		AllowOrigins: []string{"*"},
 		AllowMethods: []string{echo.GET, echo.POST},
 	}))
-
-	e.Use(echojwt.JWT([]byte("secretkey")))
 
 	// Middleware
 	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
@@ -80,23 +82,27 @@ func newRouter(s *Server) *echo.Echo {
 		}
 	})
 
-	// []Note
-	e.GET("/note", getAll)
-
-	// Note
-	e.POST("/note", save)
-
-	// {noteId, userId, permission}
-	e.POST("/share", share)
-
-	// {noteId, userId}
-	e.POST("/unshare", unshare)
-
 	// {email, password}
 	e.POST("/login", login)
 
 	// {name, email, password}
 	e.POST("/register", register)
+
+	r := e.Group("")
+
+	r.Use(echojwt.JWT([]byte("secretkey")))
+
+	// []Note
+	r.GET("/note", getAll)
+
+	// Note
+	r.POST("/note", save)
+
+	// {noteId, userId, permission}
+	r.POST("/share", share)
+
+	// {noteId, userId}
+	r.POST("/unshare", unshare)
 
 	return e
 }
@@ -127,28 +133,35 @@ func (s *Server) DeleteAcl(body []byte) error {
 	return err
 }
 
-func (s *Server) CheckAcl(object, relation, user string) error {
+func (s *Server) CheckAcl(object, relation, user string) (bool, error) {
 	endpoint := fmt.Sprintf("http://%s%s%s", s.Zanzibar.Ip, s.Zanzibar.Port, core.CheckEndpoint)
 	url := fmt.Sprintf("%s?object=note:%s&relation=%s&user=user:%s", endpoint, object, relation, user)
-	_, err := s.SendRequest(http.MethodGet, url, nil)
-	return err
+	resp, err := s.SendRequest(http.MethodGet, url, nil)
+	b, _ := io.ReadAll(resp.Body)
+	body := string(b[:])
+	if strings.Contains(body, "true") {
+		return true, err
+	}
+	return false, err
 }
 
 func (s *Server) SendRequest(method, url string, body []byte) (*http.Response, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(time.Second*5))
 	defer cancel()
 
-	var reqBody *bytes.Buffer = nil
-	if body != nil {
-		reqBody = bytes.NewBuffer(body)
-	}
+	//var reqBody *bytes.Buffer = nil
+	//if body != nil {
+	//	reqBody = bytes.NewBuffer(body)
+	//}
 
-	req, err := http.NewRequest(method, url, reqBody)
-	req = req.WithContext(ctx)
+	req, err := http.NewRequest(method, url, bytes.NewBuffer(body))
 
 	if err != nil {
 		return nil, err
 	}
+
+	req = req.WithContext(ctx)
+	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
 	response, err := client.Do(req)

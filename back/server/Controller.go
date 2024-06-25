@@ -34,16 +34,16 @@ func getAll(c echo.Context) error {
 	for _, note := range notes {
 		var userNote core.UsersNoteDTO
 		for _, p := range permissions {
-			if err := s.CheckAcl(strconv.Itoa(note.Id), p, userId); err == nil {
+			if b, err := s.CheckAcl(strconv.Itoa(note.Id), p, userId); err == nil && b {
 				userNote = core.UsersNoteDTO{
 					NoteId:     note.Id,
 					Content:    note.Content,
 					Title:      note.Title,
 					Permission: p,
 				}
+				ret = append(ret, &userNote)
 				break
 			}
-			ret = append(ret, &userNote)
 		}
 	}
 
@@ -76,7 +76,7 @@ func save(c echo.Context) error {
 
 	payload := map[string]string{
 		"object":   fmt.Sprintf("note:%d", note.Id),
-		"relation": "relation:owner",
+		"relation": "owner",
 		"user":     fmt.Sprintf("user:%s", userId),
 	}
 
@@ -94,7 +94,7 @@ func save(c echo.Context) error {
 	return c.JSON(http.StatusOK, note)
 }
 
-func isOwner(c echo.Context) error {
+func isOwner(c echo.Context, dto core.ShareDTO) error {
 	cc := c.(*CustomContext)
 	s := cc.Server
 
@@ -104,12 +104,7 @@ func isOwner(c echo.Context) error {
 	id := claims["id"].(float64)
 	idStr := strconv.FormatFloat(id, 'f', -1, 64)
 
-	var dto core.ShareDTO
-	if err := c.Bind(&dto); err != nil {
-		return fmt.Errorf("invalid body format")
-	}
-
-	if err := s.CheckAcl(strconv.Itoa(dto.NoteId), "owner", idStr); err != nil {
+	if b, err := s.CheckAcl(strconv.Itoa(dto.NoteId), "owner", idStr); err != nil && !b {
 		return fmt.Errorf("you are not the owner of this note")
 	}
 
@@ -119,20 +114,22 @@ func isOwner(c echo.Context) error {
 func share(c echo.Context) error {
 	cc := c.(*CustomContext)
 	s := cc.Server
-	if err := isOwner(c); err != nil {
+
+	var dto core.ShareDTO
+	if err := c.Bind(&dto); err != nil {
+		return fmt.Errorf("invalid body format")
+	}
+
+	if err := isOwner(c, dto); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{
 			"error": err.Error(),
 		})
 	}
 
-	// Checked in isOwner
-	var dto core.ShareDTO
-	_ = c.Bind(&dto)
-
 	payload := map[string]string{
 		"object":   fmt.Sprintf("note:%d", dto.NoteId),
-		"relation": fmt.Sprintf("relation:%s", dto.Permission),
-		"user":     fmt.Sprintf("user:%s", dto.UserId),
+		"relation": dto.Permission,
+		"user":     fmt.Sprintf("user:%d", dto.UserId),
 	}
 
 	jsonData, err := json.Marshal(payload)
@@ -156,20 +153,22 @@ func share(c echo.Context) error {
 func unshare(c echo.Context) error {
 	cc := c.(*CustomContext)
 	s := cc.Server
-	if err := isOwner(c); err != nil {
+
+	var dto core.ShareDTO
+	if err := c.Bind(&dto); err != nil {
+		return fmt.Errorf("invalid body format")
+	}
+
+	if err := isOwner(c, dto); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{
 			"error": err.Error(),
 		})
 	}
 
-	// Checked in isOwner
-	var dto core.ShareDTO
-	_ = c.Bind(&dto)
-
 	payload := map[string]string{
 		"object":   fmt.Sprintf("note:%d", dto.NoteId),
 		"relation": fmt.Sprintf("relation:%s", dto.Permission),
-		"user":     fmt.Sprintf("user:%s", dto.UserId),
+		"user":     fmt.Sprintf("user:%d", dto.UserId),
 	}
 
 	jsonData, err := json.Marshal(payload)

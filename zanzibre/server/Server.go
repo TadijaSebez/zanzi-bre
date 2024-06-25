@@ -24,9 +24,9 @@ type CustomContext struct {
 }
 
 type Acl struct {
-	Object   string
-	Relation string
-	User     string
+	Object   string `json:"object"`
+	Relation string `json:"relation"`
+	User     string `json:"user"`
 }
 
 func newRouter(s *Server) *echo.Echo {
@@ -115,7 +115,7 @@ func (s *Server) dbDel(key []byte) error {
 
 func (s *Server) checkAcl(object, relation, user string) bool {
 	template := s.Engine.Template
-	namespace := strings.Split(object, ":")[1]
+	namespace := strings.Split(object, ":")[0]
 
 	if template.Namespace != namespace {
 		return false

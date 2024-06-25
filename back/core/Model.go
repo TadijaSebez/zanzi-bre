@@ -26,7 +26,7 @@ type LoginDTO struct {
 
 type ShareDTO struct {
 	NoteId     int    `json:"noteId"`
-	UserId     string `json:"userId"`
+	UserId     int    `json:"userId"`
 	Permission string `json:"permission"`
 }
 
