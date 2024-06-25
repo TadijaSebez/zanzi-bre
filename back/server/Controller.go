@@ -20,6 +20,11 @@ func save(c echo.Context) error {
 	cc := c.(*CustomContext)
 	s := cc.Server
 
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	id := claims["id"].(float64)
+	userId := strconv.FormatFloat(id, 'f', -1, 64)
+
 	var dto core.Note
 	if err := c.Bind(&dto); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{
@@ -33,6 +38,23 @@ func save(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{
 			"error": err.Error(),
 		})
+	}
+
+	payload := map[string]string{
+		"object":   fmt.Sprintf("note:%d", note.Id),
+		"relation": "relation:owner",
+		"user":     fmt.Sprintf("user:%s", userId),
+	}
+
+	jsonData, err := json.Marshal(payload)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": "error creating payload",
+		})
+	}
+
+	if err := s.SendAcl(jsonData); err != nil {
+		return fmt.Errorf("failed to save the permission to zanzibar")
 	}
 
 	return c.JSON(http.StatusOK, note)
