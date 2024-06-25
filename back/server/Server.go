@@ -46,7 +46,7 @@ func New(port int, ip string, zanzibarPort int, zanzibarIp string) (*Server, err
 
 	zanzibar := &core.Zanzibar{
 		Ip:   zanzibarIp,
-		Port: fmt.Sprintf(":%s", zanzibarPort),
+		Port: fmt.Sprintf(":%d", zanzibarPort),
 	}
 
 	s := &Server{
