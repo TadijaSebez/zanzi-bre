@@ -141,3 +141,145 @@ Ovo poglavlje je samo placeholder za novije verzije OWASP ASVS.
 
 Trebalo bi uraditi bezbedan deploy aplikacije.
 
+
+## V2 Authentication
+
+### V2.1 Password Security
+
+|Identifikator|Opis|L1|L2|L3|CWE|Ispunjeno?||
+|---|---|---|---|---|---|---|---|
+|2.1.1|Verify that user set passwords are at least 12 characters in length (after multiple spaces are combined). (C6)|&check;|&check;|&check;|521|Ne|Nema provere za dužinu passworda na backu|
+|2.1.2|Verify that passwords of at least 64 characters are permitted, and that passwords of more than 128 characters are denied. (C6)|&check;|&check;|&check;|521|Ne||
+|2.1.3|Verify that password truncation is not performed. However, consecutive multiple spaces may be replaced by a single space. (C6)|&check;|&check;|&check;|521|Da||
+|2.1.4|Verify that any printable Unicode character, including language neutral characters such as spaces and Emojis are permitted in passwords.|&check;|&check;|&check;|521|Da||
+|2.1.5|Verify users can change their password.|&check;|&check;|&check;|620|Ne|Nije implementirano|
+|2.1.6|Verify that password change functionality requires the user's current and new password.|&check;|&check;|&check;|620|Ne||
+|2.1.7|Verify that passwords submitted during account registration, login, and password change are checked against a set of breached passwords either locally (such as the top 1,000 or 10,000 most common passwords which match the system's password policy) or using an external API. If using an API a zero knowledge proof or other mechanism should be used to ensure that the plain text password is not sent or used in verifying the breach status of the password. If the password is breached, the application must require the user to set a new non-breached password. (C6)|&check;|&check;|&check;|521|Ne|Nije implementirano|
+|2.1.8|Verify that a password strength meter is provided to help users set a stronger password.|&check;|&check;|&check;|521|Ne||
+|2.1.9|Verify that there are no password composition rules limiting the type of characters permitted. There should be no requirement for upper or lower case or numbers or special characters. (C6)|&check;|&check;|&check;|521|Da|Nema pravila koja ograničavaju karaktere u passwordu|
+|2.1.10|Verify that there are no periodic credential rotation or password history requirements.|&check;|&check;|&check;|263|Da|Nema rotacije passworda|
+|2.1.11|Verify that "paste" functionality, browser password helpers, and external password managers are permitted.|&check;|&check;|&check;|521|Da||
+|2.1.12|Verify that the user can choose to either temporarily view the entire masked password, or temporarily view the last typed character of the password on platforms that do not have this as built-in functionality.|&check;|&check;|&check;|521|Da||
+
+Trebalo bi ograničiti dužinu passworda, zahtevati jake passworde koji nisu ukradeni u prethodnim hakerskim napadima i dozvoliti promenu passworda.
+
+
+### V2.2 General Authenticator Security
+
+|Identifikator|Opis|L1|L2|L3|CWE|Ispunjeno?||
+|---|---|---|---|---|---|---|---|
+|2.2.1|Verify that anti-automation controls are effective at mitigating breached credential testing, brute force, and account lockout attacks. Such controls include blocking the most common breached passwords, soft lockouts, rate limiting, CAPTCHA, ever increasing delays between attempts, IP address restrictions, or risk-based restrictions such as location, first login on a device, recent attempts to unlock the account, or similar. Verify that no more than 100 failed attempts per hour is possible on a single account.|&check;|&check;|&check;|307|Ne||
+|2.2.2|Verify that the use of weak authenticators (such as SMS and email) is limited to secondary verification and transaction approval and not as a replacement for more secure authentication methods. Verify that stronger methods are offered before weak methods, users are aware of the risks, or that proper measures are in place to limit the risks of account compromise.|&check;|&check;|&check;|304|Da|Nemamo SMS ili email autentifikaciju|
+|2.2.3|Verify that secure notifications are sent to users after updates toauthentication details, such as credential resets, email or address changes, logging in from unknown or risky locations. The use of push notifications - rather than SMS or email - is preferred, but in the absence of push notifications, SMS or email is acceptable as long as no sensitive information is disclosed in the notification.|&check;|&check;|&check;|620|Ne|Nemamo notifikacije|
+|2.2.4|Verify impersonation resistance against phishing, such as the use of multi-factor authentication, cryptographic devices with intent (such as connected keys with a push to authenticate), or at higher AAL levels, client-side certificates.|||&check;|308|Ne|Nemamo multi-factor autentifikaciju|
+|2.2.5|Verify that where a Credential Service Provider (CSP) and the application verifying authentication are separated, mutually authenticated TLS is in place between the two endpoints.|||&check;|319|Da|Imamo https komunikaciju između komponenti|
+|2.2.6|Verify replay resistance through the mandated use of One-time Passwords (OTP) devices, cryptographic authenticators, or lookup codes.|||&check;|308|Ne|Nemamo one-time passworde|
+|2.2.7|Verify intent to authenticate by requiring the entry of an OTP token or user-initiated action such as a button press on a FIDO hardware key.|||&check;|308|Ne||
+
+Trebalo bi dodati notifikacije za promene passworda, dodati multi-factor autentifikaciju i one-time passworde.
+
+
+### V2.3 Authenticator Lifecycle
+
+|Identifikator|Opis|L1|L2|L3|CWE|Ispunjeno?||
+|---|---|---|---|---|---|---|---|
+|2.3.1|Verify system generated initial passwords or activation codes SHOULD be securely randomly generated, SHOULD be at least 6 characters long, and MAY contain letters and numbers, and expire after a short period of time. These initial secrets must not be permitted to become the long term password.|&check;|&check;|&check;|330|Da|Nemamo inicijalne passworde generisane od sistema|
+|2.3.2|Verify that enrollment and use of user-provided authentication devices are supported, such as a U2F or FIDO tokens.||&check;|&check;|308|Ne||
+|2.3.3|Verify that renewal instructions are sent with sufficient time to renew time bound authenticators.||&check;|&check;|287|Ne||
+
+
+### V2.4 Credential Storage
+
+|Identifikator|Opis|L1|L2|L3|CWE|Ispunjeno?||
+|---|---|---|---|---|---|---|---|
+|2.4.1|Verify that passwords are stored in a form that is resistant to offline attacks. Passwords SHALL be salted and hashed using an approved one-way key derivation or password hashing function. Key derivation and password hashing functions take a password, a salt, and a cost factor as inputs when generating a password hash. (C6)||&check;|&check;|916|Ne|Nismo koristili salt|
+|2.4.2|Verify that the salt is at least 32 bits in length and be chosen arbitrarily to minimize salt value collisions among stored hashes. For each credential, a unique salt value and the resulting hash SHALL be stored. (C6)||&check;|&check;|916|Ne||
+|2.4.3|Verify that if PBKDF2 is used, the iteration count SHOULD be as large as verification server performance will allow, typically at least 100,000 iterations. (C6)||&check;|&check;|916|Da|Nismo koristili PBKDF2|
+|2.4.4|Verify that if bcrypt is used, the work factor SHOULD be as large as verification server performance will allow, with a minimum of 10. (C6)||&check;|&check;|916|Da||
+|2.4.5|Verify that an additional iteration of a key derivation function is performed, using a salt value that is secret and known only to the verifier. Generate the salt value using an approved random bit generator [SP 800-90Ar1] and provide at least the minimum security strength specified in the latest revision of SP 800-131A. The secret salt value SHALL be stored separately from the hashed passwords (e.g., in a specialized device like a hardware security module).||&check;|&check;|916|Ne||
+
+Trebalo bi dodati salt kod heshiranja passworda.
+
+
+### V2.5 Credential Recovery
+
+|Identifikator|Opis|L1|L2|L3|CWE|Ispunjeno?||
+|---|---|---|---|---|---|---|---|
+|2.5.1|Verify that a system generated initial activation or recovery secret is not sent in clear text to the user. (C6)|&check;|&check;|&check;|640|Da||
+|2.5.2|Verify password hints or knowledge-based authentication (socalled "secret questions") are not present.|&check;|&check;|&check;|640|Da||
+|2.5.3|Verify password credential recovery does not reveal the current password in any way. (C6)|&check;|&check;|&check;|640|Da||
+|2.5.4|Verify shared or default accounts are not present (e.g. "root", "admin", or "sa").|&check;|&check;|&check;|16|Da||
+|2.5.5|Verify that if an authentication factor is changed or replaced, that the user is notified of this event.|&check;|&check;|&check;|304|Ne|Nemamo notifikacije|
+|2.5.6|Verify forgotten password, and other recovery paths use a secure recovery mechanism, such as time-based OTP (TOTP) or other soft token, mobile push, or another offline recovery mechanism. (C6)|&check;|&check;|&check;|640|Ne||
+|2.5.7|Verify that if OTP or multi-factor authentication factors are lost, that evidence of identity proofing is performed at the same level as during enrollment.|&check;|&check;|&check;|308|Ne||
+
+
+### V2.6 Look-up Secret Verifier
+
+|Identifikator|Opis|L1|L2|L3|CWE|Ispunjeno?||
+|---|---|---|---|---|---|---|---|
+|2.6.1|Verify that lookup secrets can be used only once.||&check;|&check;|308|Da|Nemamo lookup secret|
+|2.6.2|Verify that lookup secrets have sufficient randomness (112 bits of entropy), or if less than 112 bits of entropy, salted with a unique and random 32-bit salt and hashed with an approved one-way hash.||&check;|&check;|330|Da||
+|2.6.3|Verify that lookup secrets are resistant to offline attacks, such as predictable values.||&check;|&check;|310|Da||
+
+
+### V2.7 Out of Band Verifier
+
+|Identifikator|Opis|L1|L2|L3|CWE|Ispunjeno?||
+|---|---|---|---|---|---|---|---|
+|2.7.1|Verify that clear text out of band (NIST "restricted") authenticators, such as SMS or PSTN, are not offered by default, and stronger alternatives such as push notifications are offered first.|&check;|&check;|&check;|287|Ne|Nemamo push notifikacije|
+|2.7.2|Verify that the out of band verifier expires out of band authentication requests, codes, or tokens after 10 minutes.|&check;|&check;|&check;|287|Ne||
+|2.7.3|Verify that the out of band verifier authentication requests, codes, or tokens are only usable once, and only for the original authentication request.|&check;|&check;|&check;|287|Ne||
+|2.7.4|Verify that the out of band authenticator and verifier communicates over a secure independent channel.|&check;|&check;|&check;|523|Ne||
+|2.7.5|Verify that the out of band verifier retains only a hashed version of the authentication code.||&check;|&check;|256|Ne||
+|2.7.6|Verify that the initial authentication code is generated by a secure random number generator, containing at least 20 bits of entropy (typically a six digital random number is sufficient).||&check;|&check;|310|Ne||
+
+
+### V2.8 One Time Verifier
+
+|Identifikator|Opis|L1|L2|L3|CWE|Ispunjeno?||
+|---|---|---|---|---|---|---|---|
+|2.8.1|Verify that time-based OTPs have a defined lifetime before expiring.|&check;|&check;|&check;|613|Ne|Nemamo OTP|
+|2.8.2|Verify that symmetric keys used to verify submitted OTPs are highly protected, such as by using a hardware security module or secure operating system based key storage.||&check;|&check;|320|Ne||
+|2.8.3|Verify that approved cryptographic algorithms are used in the generation, seeding, and verification of OTPs.||&check;|&check;|326|Ne||
+|2.8.4|Verify that time-based OTP can be used only once within the validity period.||&check;|&check;|287|Ne||
+|2.8.5|Verify that if a time-based multi-factor OTP token is re-used during the validity period, it is logged and rejected with secure notifications being sent to the holder of the device.||&check;|&check;|287|Ne||
+|2.8.6|Verify physical single-factor OTP generator can be revoked in case of theft or other loss. Ensure that revocation is immediately effective across logged in sessions, regardless of location.||&check;|&check;|613|Ne||
+|2.8.7|Verify that biometric authenticators are limited to use only as secondary factors in conjunction with either something you have and something you know.|||&check;|308|Ne|Nemamo biometrijsku autentifikaciju|
+
+
+### V2.9 Cryptographic Verifier
+
+|Identifikator|Opis|L1|L2|L3|CWE|Ispunjeno?||
+|---|---|---|---|---|---|---|---|
+|2.9.1|Verify that cryptographic keys used in verification are stored securely and protected against disclosure, such as using a Trusted Platform Module (TPM) or Hardware Security Module (HSM), or an OS service that can use this secure storage.||&check;|&check;|320|Ne||
+|2.9.2|Verify that the challenge nonce is at least 64 bits in length, and statistically unique or unique over the lifetime of the cryptographic device.||&check;|&check;|330|Ne||
+|2.9.3|Verify that approved cryptographic algorithms are used in the generation, seeding, and verification.||&check;|&check;|327|Ne||
+
+
+### V2.10 Service Authentication
+
+|Identifikator|Opis|L1|L2|L3|CWE|Ispunjeno?||
+|---|---|---|---|---|---|---|---|
+|2.10.1|Verify that intra-service secrets do not rely on unchanging credentials such as passwords, API keys or shared accounts with privileged access.||&check;|&check;|287|Da||
+|2.10.2|Verify that if passwords are required for service authentication, the service account used is not a default credential. (e.g. root/root or admin/admin are default in some services during installation).||&check;|&check;|255|Da||
+|2.10.3|Verify that passwords are stored with sufficient protection to prevent offline recovery attacks, including local system access.||&check;|&check;|522|Ne||
+|2.10.4|Verify passwords, integrations with databases and thirdparty systems, seeds and internal secrets, and API keys are managed securely and not included in the source code or stored within source code repositories. Such storage SHOULD resist offline attacks. The use of a secure software key store (L1), hardware TPM, or an HSM (L3) is recommended for password storage.||&check;|&check;|798|Ne|Passwordi se nalaze u repozitorijumu|
+
+Trebalo bi više voditi računa o intraservisnim kredencijalima.
+
+
+## V3 Session Management
+
+### V3.1 Fundamental Session Management Security
+
+|Identifikator|Opis|L1|L2|L3|CWE|Ispunjeno?||
+|---|---|---|---|---|---|---|---|
+|3.1.1|Verify the application never reveals session tokens in URL parameters.|&check;|&check;|&check;|598|Da||
+
+
+### V3.2 Session Binding
+
+|Identifikator|Opis|L1|L2|L3|CWE|Ispunjeno?||
+|---|---|---|---|---|---|---|---|
+
