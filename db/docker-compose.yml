@@ -1,0 +1,41 @@
+version: '3.8'
+services:
+  postgres-noter:
+    image: postgres
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=user
+      - POSTGRES_DB=back
+    volumes:
+      - postgres-db-volume:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    networks:
+      - postgres-db-network-noter
+
+  pgadmin-noter:
+      image: dpage/pgadmin4
+      environment:
+        PGADMIN_DEFAULT_EMAIL: 'admin@admin.com'
+        PGADMIN_DEFAULT_PASSWORD: 'admin'
+      ports:
+        - 5555:80
+      # volumes:
+      #   - ./servers.json:/pgadmin4/servers.json
+      #   - ./pgpass:/pgadmin4/pgpass
+      networks:
+        - postgres-db-network-noter
+
+
+volumes:
+  postgres-db-volume:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./data
+
+
+networks:
+  postgres-db-network-noter:
+    driver: bridge

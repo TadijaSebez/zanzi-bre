@@ -6,3 +6,6 @@
 zanzibre/parser/*.json
 zanzibre/zanzibase/*
 zanzibre/zanzibase/
+
+db/data/*
+db/data

@@ -1,4 +1,6 @@
 import React, { useState, useMemo } from "react";
+import axios from 'axios';
+import {API} from '../../environment'
 
 export function LoginPage() {
     return(
@@ -31,22 +33,15 @@ function LoginForm() {
             "email" : email,
             "password" : password
         }
-        // axios.post(API + "/user/login", payload)
-        //     .then(resp => {
-        //         console.log(resp);
-        //         console.log("isAdmin:", resp.data.userRole == "ROLE_ADMIN");
+        axios.post(API + "/login", payload)
+            .then(resp => {
+                localStorage.setItem("token", resp.data.token)
+                localStorage.setItem("email", resp.data.email)
+                localStorage.setItem("id", resp.data.userId)
 
-        //         localStorage.setItem("token", resp.data.accessToken)
-        //         localStorage.setItem("username", resp.data.email)
-        //         localStorage.setItem("id", resp.data.userId)
-        //         localStorage.setItem("isUser", resp.data.userRole == "ROLE_USER")
-        //         localStorage.setItem("isAdmin", resp.data.userRole == "ROLE_ADMIN")
-
-        //         if (resp.data.userRole == "ROLE_USER") window.location.href = '/library'
-        //         else window.location.href = '/admin/book/new'
-
-        //     })
-        //     .catch(e => alert("Opsie - Login failed"))
+                window.location.href = "/home"
+            })
+            .catch(e => alert("Opsie - Login failed"))
     }
 
     return(

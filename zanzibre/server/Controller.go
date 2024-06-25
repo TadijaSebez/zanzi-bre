@@ -20,6 +20,8 @@ func putAcl(c echo.Context) error {
 	}
 
 	key := fmt.Sprintf("%s#%s@%s", acl.Object, acl.Relation, acl.User)
+	fmt.Printf("[*] Putting: %s\n", key)
+
 	err := s.dbPut([]byte(key), []byte(""))
 
 	if err != nil {
@@ -39,6 +41,8 @@ func getAcl(c echo.Context) error {
 	r := c.QueryParam("relation")
 	u := c.QueryParam("user")
 
+	fmt.Printf("[*] Checking: %s#%s@%s\n", o, r, u)
+
 	if o == "" || r == "" || u == "" {
 		return c.JSON(http.StatusNotFound, map[string]string{
 			"error": "expected query parameters object, relation, user.",
@@ -48,7 +52,32 @@ func getAcl(c echo.Context) error {
 	isOk := s.checkAcl(o, r, u)
 	value := strconv.FormatBool(isOk)
 
-	return c.JSON(http.StatusNotFound, map[string]string{
+	return c.JSON(http.StatusOK, map[string]string{
 		"authorized": string(value),
 	})
+}
+
+func delAcl(c echo.Context) error {
+	cc := c.(*CustomContext)
+	s := cc.Server
+
+	var acl Acl
+	if err := c.Bind(&acl); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": "Invalid request",
+		})
+	}
+
+	key := fmt.Sprintf("%s#%s@%s", acl.Object, acl.Relation, acl.User)
+	fmt.Printf("[*] Deleting: %s\n", key)
+
+	err := s.dbDel([]byte(key))
+
+	if err != nil {
+		return c.JSON(http.StatusNotFound, map[string]string{
+			"error": err.Error(),
+		})
+	}
+
+	return c.String(http.StatusOK, key)
 }

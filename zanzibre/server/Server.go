@@ -24,9 +24,9 @@ type CustomContext struct {
 }
 
 type Acl struct {
-	Object   string
-	Relation string
-	User     string
+	Object   string `json:"object"`
+	Relation string `json:"relation"`
+	User     string `json:"user"`
 }
 
 func newRouter(s *Server) *echo.Echo {
@@ -45,6 +45,7 @@ func newRouter(s *Server) *echo.Echo {
 
 	e.POST("/acl", putAcl)
 	e.GET("/acl/check", getAcl)
+	e.POST("/acl/delete", delAcl)
 
 	return e
 }
@@ -98,9 +99,23 @@ func (s *Server) dbGet(key []byte) ([]byte, error) {
 	return value, err
 }
 
+func (s *Server) dbDel(key []byte) error {
+	db, err := leveldb.OpenFile(s.DbPath, nil)
+
+	if err != nil {
+		return err
+	}
+
+	defer db.Close()
+
+	err = db.Delete(key, nil)
+
+	return err
+}
+
 func (s *Server) checkAcl(object, relation, user string) bool {
 	template := s.Engine.Template
-	namespace := strings.Split(object, ":")[1]
+	namespace := strings.Split(object, ":")[0]
 
 	if template.Namespace != namespace {
 		return false

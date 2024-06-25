@@ -1,25 +1,35 @@
 import { useEffect, useState } from "react";
 import { PopUpFrame } from "../../components/pop-up/PopUpFrame";
 import { DropDownSelect } from "../../components/drop-down/DropDown";
+import axios from 'axios';
+import {API} from '../../environment'
 
-export default function ShareSlideOut({popup}) {
-
+export default function ShareSlideOut({popup, note}) {
+    const token = localStorage.getItem("token")
+    const [noteId, setNoteId] = useState(-1)
     const [sharedWith, setSharedWith] = useState([])
-    const fetchSharedWith = () => {
-        // TODO Fetch
-        // let temp = []
-        // for(let i = 1; i < 6; i++) {
-        //     temp.push({
-        //         name: 'Name Surname',
-        //         email: 'user' + i + '@email.com',
-        //         premission: i < 3 ? 'EDITOR' : 'VIEWER'
-        //     })
-        // }
-        // setSharedWith(temp)
+    const fetchSharedWith = (id) => {
+        axios.get(API + "/share/" + id, { headers: {"Authorization" : `Bearer ${token}`}})
+            .then(resp => {
+                console.log(resp.data)
+                setSharedWith(resp.data);
+            })
+            .catch(e => alert("Couldn't share note"))
     }
     const removeAlreadyShared = (share) => {
-        // TODO Send premissions removed
-        setSharedWith((prev) => prev.filter(item => item.email != share.email))
+        let payload = {
+            userEmail: share.email,
+            permission: share.permission,
+            noteId: noteId,
+        }
+
+        console.log(payload)
+
+        axios.post(API + "/unshare", payload, { headers: {"Authorization" : `Bearer ${token}`}})
+            .then(resp => {
+                setSharedWith((prev) => prev.filter(item => item.email != share.email))
+            })
+            .catch(e => alert("Couldn't share note"))
     }
 
 
@@ -36,20 +46,28 @@ export default function ShareSlideOut({popup}) {
     const handleEnterPress = (e) => {
         if (e.code == 'Enter') addPendingShare(pendingEmail)
     }
-    const sendRequest = () => {
+    const sendRequest = async () => {
         // TODO Send premissions added
-        setSharedWith((prev) => {
-            let add = []
-            pendingShare.forEach((user) => {
-                console.log(user);
-                add.push({
-                    name: 'Name Surname',
-                    email: user,
-                    premission: pendingAs == 0 ? 'EDITOR' : 'VIEWER'
-                })
-            })
-            return [...prev, ...add]
-        })
+        for (const email of pendingShare) {
+            let payload = {
+                userEmail: email,
+                permission: pendingAs == 0 ? 'viewer' : 'editor',
+                noteId: noteId,
+            }
+
+            try {
+                let resp = await axios.post(API + "/share", payload, { headers: {"Authorization" : `Bearer ${token}`}})
+                console.log(resp.data);
+                setSharedWith((prev) => [...prev, {
+                    email: resp.data.email,
+                    permission: resp.data.permission,
+                    noteId: noteId,
+                    name: resp.data.name
+                }]);
+            } catch {
+                alert("Couldnt share note")
+            }
+        }
         setPendingEmail('')
         setPendingShare([])
     }
@@ -58,8 +76,12 @@ export default function ShareSlideOut({popup}) {
 
 
     useEffect(() => {
-        fetchSharedWith()
-    }, [])
+        if (note != undefined && note.noteId != -1) {
+            console.log(note)
+            fetchSharedWith(note.noteId)
+            setNoteId(note.noteId)
+        }
+    }, [note])
 
 
     return(
@@ -92,10 +114,10 @@ export default function ShareSlideOut({popup}) {
                             {sharedWith.map(user => {return(
                                 <div className="solid-chip shared-with-chip" style={{height:'48px'}} onClick={() => removeAlreadyShared(user)}>
                                     <div className="flex center gap-xs main-content main-content h-100">
-                                        <span className="material-symbols-outlined icon small-icon">{user.premission == 'EDITOR'? 'edit' : 'visibility'}</span>
+                                        <span className="material-symbols-outlined icon small-icon">{user.permission == 'editor'? 'edit' : 'visibility'}</span>
                                         <div className="h-spacer-xs">
                                             <p className="card-body">{user.name}</p>
-                                            <p className="card-label neutral">{user.premission}</p>
+                                            <p className="card-label neutral">{user.permission}</p>
                                         </div>
                                     </div>
                                     <div className="flex center justify-center gap-xs secondary-content h-100" style={{width:'calc(100% - 8px)', translate:'-9px 0'}}>
@@ -114,7 +136,7 @@ export default function ShareSlideOut({popup}) {
                             <span className="material-symbols-outlined icon input-icon">email</span>
                             <input placeholder="Email" value={pendingEmail} onChange={(e) => setPendingEmail(e.target.value)} onKeyUp={handleEnterPress}/>
                         </div>
-                        <DropDownSelect icon={'supervisor_account'} placeholder={'Premission'} options={premissionLevels} callback={(val) => setPendingAs(val)} initialValue={0}/>
+                        <DropDownSelect icon={'supervisor_account'} placeholder={'Permission'} options={premissionLevels} callback={(val) => setPendingAs(val)} initialValue={0}/>
                     </div>
                     <div className="flex wrap center gap-xxs v-spacer-s">
                         {pendingShare.map(pending => {return(
