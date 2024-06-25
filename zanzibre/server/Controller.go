@@ -2,7 +2,9 @@ package server
 
 import (
 	"fmt"
+	"io"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/labstack/echo/v4"
@@ -80,4 +82,48 @@ func delAcl(c echo.Context) error {
 	}
 
 	return c.String(http.StatusOK, key)
+}
+
+func addNamespace(c echo.Context) error {
+	cc := c.(*CustomContext)
+	s := cc.Server
+
+	file, err := c.FormFile("file")
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": err.Error(),
+		})
+	}
+	src, err := file.Open()
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": err.Error(),
+		})
+	}
+	defer src.Close()
+
+	dst, err := os.Create("temp.ent")
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": err.Error(),
+		})
+	}
+	defer dst.Close()
+
+	if _, err = io.Copy(dst, src); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": err.Error(),
+		})
+	}
+
+	template, err := s.addNamespace()
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": err.Error(),
+		})
+	}
+
+	s.Engine.AddTemplate(template)
+
+	return c.NoContent(200)
 }

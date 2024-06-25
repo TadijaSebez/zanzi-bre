@@ -91,6 +91,7 @@ func save(c echo.Context) error {
 		})
 	}
 
+	// TODO: Only when inserting
 	payload := map[string]string{
 		"object":   fmt.Sprintf("note:%d", note.NoteId),
 		"relation": relation,

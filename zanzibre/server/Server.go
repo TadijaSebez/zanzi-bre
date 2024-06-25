@@ -1,8 +1,10 @@
 package server
 
 import (
+	"bytes"
 	"fmt"
 	"log"
+	"os/exec"
 	"placeholder/zanzibar/core"
 	"strconv"
 	"strings"
@@ -16,6 +18,7 @@ type Server struct {
 	Ip     string
 	DbPath string
 	Engine *core.Engine
+	PyPath string
 }
 
 type CustomContext struct {
@@ -46,11 +49,12 @@ func newRouter(s *Server) *echo.Echo {
 	e.POST("/acl", putAcl)
 	e.GET("/acl/check", getAcl)
 	e.POST("/acl/delete", delAcl)
+	e.POST("/namespace", addNamespace)
 
 	return e
 }
 
-func New(ip string, port int, dbPath string, engine *core.Engine) (*Server, error) {
+func New(ip string, port int, dbPath string, engine *core.Engine, pyPath string) (*Server, error) {
 	if port < 1000 || port > 65535 {
 		return nil, fmt.Errorf("invalid port value")
 	}
@@ -60,6 +64,7 @@ func New(ip string, port int, dbPath string, engine *core.Engine) (*Server, erro
 		Ip:     ip,
 		DbPath: dbPath,
 		Engine: engine,
+		PyPath: pyPath,
 	}
 
 	return server, nil
@@ -114,19 +119,19 @@ func (s *Server) dbDel(key []byte) error {
 }
 
 func (s *Server) checkAcl(object, relation, user string) bool {
-	template := s.Engine.Template
 	namespace := strings.Split(object, ":")[0]
+	model := findNamespace(s.Engine.Template, namespace)
 
-	if template.Namespace != namespace {
+	if model == nil {
 		return false
 	}
 
-	r := findRelation(template, relation)
+	r := findRelation(model, relation)
 	if r == nil {
 		return false
 	}
 
-	return s.evaluateRelation(template, r, object, user)
+	return s.evaluateRelation(model, r, object, user)
 }
 
 func (s *Server) evaluateRelation(template *core.Model, relation *core.Relation, object, user string) bool {
@@ -194,8 +199,38 @@ func findRelation(template *core.Model, name string) *core.Relation {
 	return nil
 }
 
+func findNamespace(template []*core.Model, namespace string) *core.Model {
+	for _, m := range template {
+		if m.Namespace == namespace {
+			return m
+		}
+	}
+	return nil
+}
+
 func (s *Server) isInDb(object, relation, user string) bool {
 	query := fmt.Sprintf("%s#%s@%s", object, relation, user)
 	_, err := s.dbGet([]byte(query))
 	return err == nil
+}
+
+func (s *Server) addNamespace() (string, error) {
+	//grammar := "--grammar ./parser/grammar.tx"
+	//model := "--model temp.ent"
+	cmd := exec.Command("python", s.PyPath, "--grammar", "./parser/grammar.tx", "--model", "temp.ent")
+
+	var out bytes.Buffer
+	cmd.Stdout = &out
+
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
+
+	err := cmd.Run()
+	fmt.Println(out.String())
+	fmt.Println(stderr.String())
+	if err != nil {
+		return "", err
+	}
+
+	return out.String(), nil
 }
