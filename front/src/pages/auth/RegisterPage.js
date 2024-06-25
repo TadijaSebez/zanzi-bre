@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import axios from 'axios';
+import {API} from '../../environment'
 
 export function RegisterPage() {
     return(
@@ -25,9 +27,9 @@ function RegisterForm() {
             "email" : email,
             "password" : password
         }
-        // axios.post(API + "/user/register", payload)
-        //     .then(res => { window.location.href = "/" })
-        //     .catch(e => alert("Opsie - Registration failed"))
+        axios.post(API + "/register", payload)
+            .then(res => { window.location.href = "/" })
+            .catch(e => alert("Opsie - Registration failed"))
     }
 
     return(

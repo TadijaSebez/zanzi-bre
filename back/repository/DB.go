@@ -89,7 +89,7 @@ func (d *DB) Insert(note core.Note) (*core.Note, error) {
 	var id int
 	err = stmt.QueryRow(note.Content, note.Title).Scan(&id)
 
-	note.Id = id
+	note.NoteId = id
 	return &note, err
 }
 
@@ -133,7 +133,7 @@ func (d *DB) Update(note core.Note) (*core.Note, error) {
 
 	defer stmt.Close()
 
-	_, err = stmt.Exec(note.Content, note.Title, note.Id)
+	_, err = stmt.Exec(note.Content, note.Title, note.NoteId)
 
 	return &note, err
 }
@@ -216,11 +216,70 @@ func (d *DB) GetAllNotes() ([]*core.Note, error) {
 	var notes []*core.Note
 	for rows.Next() {
 		var note core.Note
-		if err := rows.Scan(&note.Id, &note.Content, &note.Title); err != nil {
+		if err := rows.Scan(&note.NoteId, &note.Content, &note.Title); err != nil {
 			return nil, err
 		}
 		notes = append(notes, &note)
 	}
 
 	return notes, nil
+}
+
+func (d *DB) FindUser(email string) *core.SharedUserDTO {
+	db, err := sql.Open("postgres", d.ConnString)
+
+	if err != nil {
+		panic(err)
+	}
+
+	defer db.Close()
+
+	query := `SELECT id, email, name FROM Users WHERE email = $1`
+	rows, err := db.Query(query, email)
+
+	if err != nil {
+		return nil
+	}
+
+	defer rows.Close()
+
+	if rows.Next() {
+		u := core.SharedUserDTO{}
+		if err := rows.Scan(&u.Id, &u.Email, &u.Name); err != nil {
+			return nil
+		}
+		return &u
+	}
+
+	return nil
+}
+
+func (d *DB) GetAllUsers() ([]*core.User, error) {
+	db, err := sql.Open("postgres", d.ConnString)
+
+	if err != nil {
+		panic(err)
+	}
+
+	defer db.Close()
+
+	query := `SELECT id, email, name FROM Users`
+	rows, err := db.Query(query)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var users []*core.User
+	for rows.Next() {
+		var user core.User
+		if err := rows.Scan(&user.Id, &user.Email, &user.Name); err != nil {
+			return nil, err
+		}
+		users = append(users, &user)
+	}
+
+	return users, nil
 }

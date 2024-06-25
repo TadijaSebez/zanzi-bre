@@ -1,7 +1,7 @@
 package core
 
 type Note struct {
-	Id      int    `json:"id"`
+	NoteId  int    `json:"noteId"`
 	Title   string `json:"title"`
 	Content string `json:"content"`
 }
@@ -26,7 +26,7 @@ type LoginDTO struct {
 
 type ShareDTO struct {
 	NoteId     int    `json:"noteId"`
-	UserId     int    `json:"userId"`
+	UserEmail  string `json:"userEmail"`
 	Permission string `json:"permission"`
 }
 
@@ -39,6 +39,18 @@ type UsersNoteDTO struct {
 	NoteId     int    `json:"noteId"`
 	Title      string `json:"title"`
 	Content    string `json:"content"`
+	Permission string `json:"permission"`
+}
+
+type SharedUserDTO struct {
+	Id    int    `json:"id"`
+	Email string `json:"email"`
+	Name  string `json:"name"`
+}
+
+type SharedWithDTO struct {
+	Email      string `json:"email"`
+	Name       string `json:"name"`
 	Permission string `json:"permission"`
 }
 

@@ -4,6 +4,8 @@ import EditNote from "./EditNote"
 import "./HomePage.css"
 import NotesList from "./NotesList"
 import ShareSlideOut from "./ShareSlideOut"
+import axios from 'axios';
+import {API} from '../../environment'
 
 export default function HomePage() {
 
@@ -14,34 +16,50 @@ export default function HomePage() {
     }
 
     const [notes, setNotes] = useState([])
+    const token = localStorage.getItem("token")
+
     const fetchNotes = () => {
-        let temp = []
-        for(let i = 1; i <= 20; i++) {
-            temp.push({
-                id: i,
-                title: "Note " + i, 
-                content: "This an example of the Note! This one is a lot longer so we can see how does the thingy work",
-                premission: i < 10 ? 'OWNER' : i < 15 ? 'EDITOR' : 'VIEWER'
+        axios.get(API + "/note", { headers: {"Authorization" : `Bearer ${token}`}})
+            .then(resp => {
+                setNotes(resp.data)
             })
-        }
-        setNotes(temp)
+            .catch(e => alert("Couldn't fetch notes"))
     }
-    // useEffect(() => fetchNotes(), [])
+    useEffect(() => fetchNotes(), [])
 
     const [noteInFocuse, setNoteInFocuse] = useState(undefined)
     const saveNote = (note) => {
         setNoteInFocuse(undefined)
-        if(note.id == null) {
-            note.id = notes.length
-            setNotes(prev => [...prev, note])
+
+        let payload = {
+            "noteId": note.noteId,
+            "title": note.title,
+            "content": note.content
         }
+
+        axios.post(API + "/note", payload, { headers: {"Authorization" : `Bearer ${token}`}})
+            .then(resp => {
+                console.log(resp)
+                console.log(resp.data)
+                if(note.noteId == -1) {
+                    setNotes(prev => [...prev, {...resp.data, permission: note.permission}])
+                } else {
+                    setNotes(prevNotes => 
+                        prevNotes.map(note => 
+                            note.noteId === resp.data.noteId ? {... resp.data, permission: note.permission} : note
+                        )
+                    );
+                }
+            })
+            .catch(e => alert("Couldn't fetch notes"))
+
     }
     const newNote = () => {
         setNoteInFocuse({
-            id: null,
+            noteId: -1,
             title: '', 
             content: '',
-            premission: 'OWNER'
+            permission: 'owner',
         })
     }
     const discard = () => {
@@ -54,14 +72,14 @@ export default function HomePage() {
                 
                 <div className="main-header flex center space-between card shadow-elevated">
                     <p className="hero-title">Not<b>ER</b></p>
-                    <button className="icon-button">
+                    <button className="icon-button" onClick={() => {window.location.href="/"}}>
                         <span className="material-symbols-outlined icon">logout</span>
                     </button>
                 </div>
                 <NotesList notes={notes} inFocuse={noteInFocuse} onNoteEdit={(note) => setNoteInFocuse(note)}/>
             </div>
             <EditNote onShareCallback={handleShare} inFocuse={noteInFocuse} onSaveCallback={saveNote} onNewNoteRequested={newNote} onDiscardCallback={discard}/>
-            <ShareSlideOut popup={sharePopup}/>
+            <ShareSlideOut popup={sharePopup} note={noteInFocuse}/>
         </div>
     )
 }

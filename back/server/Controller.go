@@ -34,9 +34,9 @@ func getAll(c echo.Context) error {
 	for _, note := range notes {
 		var userNote core.UsersNoteDTO
 		for _, p := range permissions {
-			if b, err := s.CheckAcl(strconv.Itoa(note.Id), p, userId); err == nil && b {
+			if b, err := s.CheckAcl(strconv.Itoa(note.NoteId), p, userId); err == nil && b {
 				userNote = core.UsersNoteDTO{
-					NoteId:     note.Id,
+					NoteId:     note.NoteId,
 					Content:    note.Content,
 					Title:      note.Title,
 					Permission: p,
@@ -45,6 +45,10 @@ func getAll(c echo.Context) error {
 				break
 			}
 		}
+	}
+
+	if ret == nil {
+		return c.JSON(http.StatusOK, make([]string, 0))
 	}
 
 	return c.JSON(http.StatusOK, ret)
@@ -66,6 +70,19 @@ func save(c echo.Context) error {
 		})
 	}
 
+	var relation string
+	if dto.NoteId != -1 {
+		relation := "owner"
+		if b, _ := s.CheckAcl(strconv.Itoa(dto.NoteId), relation, userId); !b {
+			relation = "editor"
+			if b, _ := s.CheckAcl(strconv.Itoa(dto.NoteId), relation, userId); !b {
+				return fmt.Errorf("you are not the owner of this note")
+			}
+		}
+	} else {
+		relation = "owner"
+	}
+
 	note, err := s.Save(dto)
 
 	if err != nil {
@@ -75,8 +92,8 @@ func save(c echo.Context) error {
 	}
 
 	payload := map[string]string{
-		"object":   fmt.Sprintf("note:%d", note.Id),
-		"relation": "owner",
+		"object":   fmt.Sprintf("note:%d", note.NoteId),
+		"relation": relation,
 		"user":     fmt.Sprintf("user:%s", userId),
 	}
 
@@ -87,8 +104,10 @@ func save(c echo.Context) error {
 		})
 	}
 
-	if err := s.SendAcl(jsonData); err != nil {
-		return fmt.Errorf("failed to save the permission to zanzibar")
+	if relation == "owner" {
+		if err := s.SendAcl(jsonData); err != nil {
+			return fmt.Errorf("failed to save the permission to zanzibar")
+		}
 	}
 
 	return c.JSON(http.StatusOK, note)
@@ -126,10 +145,17 @@ func share(c echo.Context) error {
 		})
 	}
 
+	user := s.Db.FindUser(dto.UserEmail)
+	if user == nil {
+		return c.JSON(http.StatusNotFound, map[string]string{
+			"error": "User with that email was not found",
+		})
+	}
+
 	payload := map[string]string{
 		"object":   fmt.Sprintf("note:%d", dto.NoteId),
 		"relation": dto.Permission,
-		"user":     fmt.Sprintf("user:%d", dto.UserId),
+		"user":     fmt.Sprintf("user:%d", user.Id),
 	}
 
 	jsonData, err := json.Marshal(payload)
@@ -147,7 +173,13 @@ func share(c echo.Context) error {
 		})
 	}
 
-	return c.NoContent(200)
+	sw := core.SharedWithDTO{
+		Email:      user.Email,
+		Name:       user.Name,
+		Permission: dto.Permission,
+	}
+
+	return c.JSON(http.StatusOK, sw)
 }
 
 func unshare(c echo.Context) error {
@@ -165,10 +197,18 @@ func unshare(c echo.Context) error {
 		})
 	}
 
+	fmt.Println(dto.UserEmail)
+	user := s.Db.FindUser(dto.UserEmail)
+	if user == nil {
+		return c.JSON(http.StatusNotFound, map[string]string{
+			"error": "User with that email was not found",
+		})
+	}
+
 	payload := map[string]string{
 		"object":   fmt.Sprintf("note:%d", dto.NoteId),
-		"relation": fmt.Sprintf("relation:%s", dto.Permission),
-		"user":     fmt.Sprintf("user:%d", dto.UserId),
+		"relation": dto.Permission,
+		"user":     fmt.Sprintf("user:%d", user.Id),
 	}
 
 	jsonData, err := json.Marshal(payload)
@@ -219,7 +259,9 @@ func login(c echo.Context) error {
 	token := core.JwtGenerator(*user, "secretkey")
 
 	return c.JSON(http.StatusOK, map[string]string{
-		"token": token,
+		"token":  token,
+		"userId": strconv.Itoa(user.Id),
+		"email":  user.Email,
 	})
 }
 
@@ -259,4 +301,61 @@ func register(c echo.Context) error {
 	}
 
 	return c.NoContent(200)
+}
+
+func getShared(c echo.Context) error {
+	cc := c.(*CustomContext)
+	s := cc.Server
+
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	id := claims["id"].(float64)
+	userId := strconv.FormatFloat(id, 'f', -1, 64)
+
+	noteId, err := strconv.Atoi(c.Param("noteId"))
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": "Invalid path parameter type",
+		})
+	}
+
+	if b, err := s.CheckAcl(strconv.Itoa(noteId), "owner", userId); err != nil && !b {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": "You are not the owner of this note",
+		})
+	}
+
+	users, err := s.Db.GetAllUsers()
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": err.Error(),
+		})
+	}
+
+	var ret []*core.SharedWithDTO
+	permissions := []string{"editor", "viewer"}
+	for _, user := range users {
+		if user.Id == int(id) {
+			continue
+		}
+		for _, p := range permissions {
+			if b, err := s.CheckAcl(strconv.Itoa(noteId), p, strconv.Itoa(user.Id)); err == nil && b {
+				sw := core.SharedWithDTO{
+					Email:      user.Email,
+					Name:       user.Name,
+					Permission: p,
+				}
+				ret = append(ret, &sw)
+				break
+			}
+		}
+	}
+
+	if ret == nil {
+		return c.JSON(http.StatusOK, make([]string, 0))
+	}
+
+	return c.JSON(http.StatusOK, ret)
 }

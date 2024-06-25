@@ -104,6 +104,9 @@ func newRouter(s *Server) *echo.Echo {
 	// {noteId, userId}
 	r.POST("/unshare", unshare)
 
+	// {name, email, permission}
+	r.GET("/share/:noteId", getShared)
+
 	return e
 }
 
@@ -114,7 +117,7 @@ func (s *Server) Serve() {
 }
 
 func (s *Server) Save(dto core.Note) (*core.Note, error) {
-	if dto.Id == -1 {
+	if dto.NoteId == -1 {
 		return s.Db.Insert(dto)
 	}
 

@@ -17,7 +17,7 @@ odnos {
 odnos {
     ime: "viewer"
     dodatak {
-        svaki {
+        bilo_koji {
             dete { ovaj {} }
             dete { postojeci_odnos { odnos: "editor" } }
         }

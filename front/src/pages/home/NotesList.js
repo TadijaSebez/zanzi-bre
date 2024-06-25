@@ -19,17 +19,17 @@ export default function NotesList({notes, inFocuse=undefined, onNoteEdit}) {
                         <p className="card-title">{item.title}</p>
                         <p className="card-body neutral note-peek">{item.content}</p>
                         
-                        {item?.premission == 'OWNER' && <div className="solid-chip small-chip tr-chip flex center gap-xxs owner-chip">
+                        {item?.permission == 'owner' && <div className="solid-chip small-chip tr-chip flex center gap-xxs owner-chip">
                             <span className="material-symbols-outlined icon small-icon">person</span>
                             <p className="card-body">Owner</p>
                         </div>}
 
-                        {item?.premission == 'EDITOR' && <div className="solid-chip small-chip tr-chip flex center gap-xxs editor-chip">
+                        {item?.permission == 'editor' && <div className="solid-chip small-chip tr-chip flex center gap-xxs editor-chip">
                             <span className="material-symbols-outlined icon small-icon">edit</span>
                             <p className="card-body">Editor</p>
                         </div>}
 
-                        {item?.premission == 'VIEWER' && <div className="solid-chip small-chip tr-chip flex center gap-xxs viewer-chip">
+                        {item?.permission == 'viewer' && <div className="solid-chip small-chip tr-chip flex center gap-xxs viewer-chip">
                             <span className="material-symbols-outlined icon small-icon">visibility</span>
                             <p className="card-body">Viewer</p>
                         </div>}
