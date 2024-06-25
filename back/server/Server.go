@@ -81,7 +81,7 @@ func newRouter(s *Server) *echo.Echo {
 	})
 
 	// []Note
-	e.GET("/note:userId", getAll)
+	e.GET("/note", getAll)
 
 	// Note
 	e.POST("/note", save)

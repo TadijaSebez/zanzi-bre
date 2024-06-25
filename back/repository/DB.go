@@ -3,7 +3,6 @@ package repository
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"placeholder/back/core"
 
 	_ "github.com/lib/pq"
@@ -152,7 +151,7 @@ func (d *DB) CheckUser(user core.UserDTO) bool {
 	rows, err := db.Query(query, user.Email)
 
 	if err != nil {
-		log.Fatalf("Error executing query: %v", err)
+		return false
 	}
 
 	defer rows.Close()
@@ -173,7 +172,7 @@ func (d *DB) LoginUser(dto core.LoginDTO) (*core.User, error) {
 	rows, err := db.Query(query, dto.Email)
 
 	if err != nil {
-		log.Fatalf("Error executing query: %v", err)
+		return nil, err
 	}
 
 	defer rows.Close()
@@ -194,4 +193,34 @@ func (d *DB) LoginUser(dto core.LoginDTO) (*core.User, error) {
 	}
 
 	return u, err
+}
+
+func (d *DB) GetAllNotes() ([]*core.Note, error) {
+	db, err := sql.Open("postgres", d.ConnString)
+
+	if err != nil {
+		panic(err)
+	}
+
+	defer db.Close()
+
+	query := `SELECT id, content, title FROM Note`
+	rows, err := db.Query(query)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var notes []*core.Note
+	for rows.Next() {
+		var note core.Note
+		if err := rows.Scan(&note.Id, &note.Content, &note.Title); err != nil {
+			return nil, err
+		}
+		notes = append(notes, &note)
+	}
+
+	return notes, nil
 }

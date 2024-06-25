@@ -35,6 +35,13 @@ type Zanzibar struct {
 	Port string
 }
 
+type UsersNoteDTO struct {
+	NoteId     int    `json:"noteId"`
+	Title      string `json:"title"`
+	Content    string `json:"content"`
+	Permission string `json:"permission"`
+}
+
 const PutEndpoint string = "/acl"
 const DelEndpoint string = "/acl/delete"
 const CheckEndpoint string = "/acl/check"

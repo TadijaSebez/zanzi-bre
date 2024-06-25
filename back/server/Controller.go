@@ -13,7 +13,41 @@ import (
 )
 
 func getAll(c echo.Context) error {
-	return c.String(http.StatusOK, "Hello, World!")
+	cc := c.(*CustomContext)
+	s := cc.Server
+
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	id := claims["id"].(float64)
+	userId := strconv.FormatFloat(id, 'f', -1, 64)
+
+	notes, err := s.Db.GetAllNotes()
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": err.Error(),
+		})
+	}
+
+	var ret []*core.UsersNoteDTO
+	permissions := []string{"owner", "editor", "viewer"}
+	for _, note := range notes {
+		var userNote core.UsersNoteDTO
+		for _, p := range permissions {
+			if err := s.CheckAcl(strconv.Itoa(note.Id), p, userId); err == nil {
+				userNote = core.UsersNoteDTO{
+					NoteId:     note.Id,
+					Content:    note.Content,
+					Title:      note.Title,
+					Permission: p,
+				}
+				break
+			}
+			ret = append(ret, &userNote)
+		}
+	}
+
+	return c.JSON(http.StatusOK, ret)
 }
 
 func save(c echo.Context) error {
