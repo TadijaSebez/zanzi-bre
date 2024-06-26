@@ -629,3 +629,60 @@ Trebalo bi da enkriptujemo komunikaciju sa bazom i da omogućimo povlačenje ser
 |11.1.8|Verify that the application has configurable alerting when automated attacks or unusual activity is detected.||&check;|&check;|390|Ne||
 
 Trebalo bi raditi monitoring tako da možemo da detektujemo kada se akcije ivršavaju previše brzo ili u pogrešnom redosledu.
+
+
+## V12 Files and Resources
+
+### V12.1 File Upload
+
+|Identifikator|Opis|L1|L2|L3|CWE|Ispunjeno?||
+|---|---|---|---|---|---|---|---|
+|12.1.1|Verify that the application will not accept large files that could fill up storage or cause a denial of service.|&check;|&check;|&check;|400|Ne|Nismo ograničili veličine fajlova|
+|12.1.2|Verify that the application checks compressed files (e.g. zip, gz, docx, odt) against maximum allowed uncompressed size and against maximum number of files before uncompressing the file.||&check;|&check;|409|Ne|Nemamo upload kompresovanih fajlova|
+|12.1.3|Verify that a file size quota and maximum number of files per user is enforced to ensure that a single user cannot fill up the storage with too many files, or excessively large files.||&check;|&check;|770|Ne||
+
+Trebalo bi ograničiti broj i veličinu fajlova koji mogu da se uploaduju.
+
+
+### V12.2 File Integrity
+
+|Identifikator|Opis|L1|L2|L3|CWE|Ispunjeno?||
+|---|---|---|---|---|---|---|---|
+|12.2.1|Verify that files obtained from untrusted sources are validated to be of expected type based on the file's content.||&check;|&check;|434|Da||
+
+
+### V12.3 File Execution
+
+|Identifikator|Opis|L1|L2|L3|CWE|Ispunjeno?||
+|---|---|---|---|---|---|---|---|
+|12.3.1|Verify that user-submitted filename metadata is not used directly by system or framework filesystems and that a URL API is used to protect against path traversal.|&check;|&check;|&check;|22|Da||
+|12.3.2|Verify that user-submitted filename metadata is validated or ignored to prevent the disclosure, creation, updating or removal of local files (LFI).|&check;|&check;|&check;|73|Ne||
+|12.3.3|Verify that user-submitted filename metadata is validated or ignored to prevent the disclosure or execution of remote files via Remote File Inclusion (RFI) or Server-side Request Forgery (SSRF) attacks.|&check;|&check;|&check;|98|Ne||
+|12.3.4|Verify that the application protects against Reflective File Download (RFD) by validating or ignoring user-submitted filenames in a JSON, JSONP, or URL parameter, the response Content-Type header should be set to text/plain, and the Content-Disposition header should have a fixed filename.|&check;|&check;|&check;|641|Da||
+|12.3.5|Verify that untrusted file metadata is not used directly with system API or libraries, to protect against OS command injection.|&check;|&check;|&check;|78|Ne||
+|12.3.6|Verify that the application does not include and execute functionality from untrusted sources, such as unverified content distribution networks, JavaScript libraries, node npm libraries, or server-side DLLs.||&check;|&check;|829|Da||
+
+Trebalo bi obrisati metapodatne iz fajlova koji se uploaduju.
+
+
+### V12.4 File Storage
+
+|Identifikator|Opis|L1|L2|L3|CWE|Ispunjeno?||
+|---|---|---|---|---|---|---|---|
+|12.4.1|Verify that files obtained from untrusted sources are stored outside the web root, with limited permissions.|&check;|&check;|&check;|552|Da||
+|12.4.2|Verify that files obtained from untrusted sources are scanned by antivirus scanners to prevent upload and serving of known malicious content.|&check;|&check;|&check;|509|Ne|Nemamo antivirus|
+
+
+### V12.5 File Download
+
+|Identifikator|Opis|L1|L2|L3|CWE|Ispunjeno?||
+|---|---|---|---|---|---|---|---|
+|12.5.1|Verify that the web tier is configured to serve only files with specific file extensions to prevent unintentional information and source code leakage. For example, backup files (e.g. .bak), temporary working files (e.g. .swp), compressed files (.zip, .tar.gz, etc) and other extensions commonly used by editors should be blocked unless required.|&check;|&check;|&check;|552|Da||
+|12.5.2|Verify that direct requests to uploaded files will never be executed as HTML/JavaScript content.|&check;|&check;|&check;|434|Da||
+
+### V12.6 SSRF Protection
+
+|Identifikator|Opis|L1|L2|L3|CWE|Ispunjeno?||
+|---|---|---|---|---|---|---|---|
+|12.6.1|Verify that the web or application server is configured with an allow list of resources or systems to which the server can send requests or load data/files from.|&check;|&check;|&check;|918|Ne||
+
