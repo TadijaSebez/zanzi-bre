@@ -686,3 +686,45 @@ Trebalo bi obrisati metapodatne iz fajlova koji se uploaduju.
 |---|---|---|---|---|---|---|---|
 |12.6.1|Verify that the web or application server is configured with an allow list of resources or systems to which the server can send requests or load data/files from.|&check;|&check;|&check;|918|Ne||
 
+
+## V13 API and Web Service
+
+### V13.1 Generic Web Service Security
+
+|Identifikator|Opis|L1|L2|L3|CWE|Ispunjeno?||
+|---|---|---|---|---|---|---|---|
+|13.1.1|Verify that all application components use the same encodings and parsers to avoid parsing attacks that exploit different URI or file parsing behavior that could be used in SSRF and RFI attacks.|&check;|&check;|&check;|116|Da||
+|13.1.2|[DELETED, DUPLICATE OF 4.3.1]||||||
+|13.1.3|Verify API URLs do not expose sensitive information, such as the API key, session tokens etc.|&check;|&check;|&check;|598|Da||
+|13.1.4|Verify that authorization decisions are made at both the URI, enforced by programmatic or declarative security at the controller or router, and at the resource level, enforced by model-based permissions.||&check;|&check;|285|Da||
+|13.1.5|Verify that requests containing unexpected or missing content types are rejected with appropriate headers (HTTP response status 406 Unacceptable or 415 Unsupported Media Type).||&check;|&check;|434|Da||
+
+
+### V13.2 RESTful Web Service
+
+|Identifikator|Opis|L1|L2|L3|CWE|Ispunjeno?||
+|---|---|---|---|---|---|---|---|
+|13.2.1|Verify that enabled RESTful HTTP methods are a valid choice for the user or action, such as preventing normal users using DELETE or PUT on protected API or resources.|&check;|&check;|&check;|650|Da||
+|13.2.2|Verify that JSON schema validation is in place and verified before accepting input.|&check;|&check;|&check;|20|Da||
+|13.2.3|Verify that RESTful web services that utilize cookies are protected from Cross-Site Request Forgery via the use of at least one or more of the following: double submit cookie pattern, CSRF nonces, or Origin request header checks.|&check;|&check;|&check;|352|Da|Ne koristimo cookies|
+|13.2.4|[DELETED, DUPLICATE OF 11.1.4]||||||
+|13.2.5|Verify that REST services explicitly check the incoming Content-Type to be the expected one, such as application/xml or application/json.||&check;|&check;|436|Da||
+|13.2.6|Verify that the message headers and payload are trustworthy and not modified in transit. Requiring strong encryption for transport (TLS only) may be sufficient in many cases as it provides both confidentiality and integrity protection. Per-message digital signatures can provide additional assurance on top of the transport protections for high-security applications but bring with them additional complexity and risks to weigh against the benefits.||&check;|&check;|345|Da|Koristimo https|
+
+
+### V13.3 SOAP Web Service
+
+|Identifikator|Opis|L1|L2|L3|CWE|Ispunjeno?||
+|---|---|---|---|---|---|---|---|
+|13.3.1|Verify that XSD schema validation takes place to ensure a properly formed XML document, followed by validation of each input field before any processing of that data takes place.|&check;|&check;|&check;|20|Da|Ne koristimo SOAP|
+|13.3.2|Verify that XSD schema validation takes place to ensure a properly formed XML document, followed by validation of each input field before any processing of that data takes place.||&check;|&check;|345|Da|Ne koristimo SOAP|
+
+
+### V13.4 GraphQL
+
+|Identifikator|Opis|L1|L2|L3|CWE|Ispunjeno?||
+|---|---|---|---|---|---|---|---|
+|13.4.1|Verify that a query allow list or a combination of depth limiting and amount limiting is used to prevent GraphQL or data layer expression Denial of Service (DoS) as a result of expensive, nested queries. For more advanced scenarios, query cost analysis should be used.||&check;|&check;|770|Da|Ne koristimo GraphQL|
+|13.4.2|Verify that GraphQL or other data layer authorization logic should be implemented at the business logic layer instead of the GraphQL layer||&check;|&check;|285|Da|Ne koristimo GraphQL|
+
+
