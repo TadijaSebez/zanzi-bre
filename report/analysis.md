@@ -613,3 +613,19 @@ Trebalo bi da enkriptujemo komunikaciju sa bazom i da omogućimo povlačenje ser
 |10.3.3|Verify that the application has protection from subdomain takeovers if the application relies upon DNS entries or DNS subdomains, such as expired domain names, out of date DNS pointers or CNAMEs, expired projects at public source code repos, or transient cloud APIs, serverless functions, or storage buckets (autogen-bucket-id.cloud.example.com) or similar. Protections can include ensuring that DNS names used by applications are regularly checked for expiry or change.|&check;|&check;|&check;|350|Ne||
 
 
+## V11 Business Logic
+
+### V11.1 Business Logic Security
+
+|Identifikator|Opis|L1|L2|L3|CWE|Ispunjeno?||
+|---|---|---|---|---|---|---|---|
+|11.1.1|Verify that the application will only process business logic flows for the same user in sequential step order and without skipping steps|&check;|&check;|&check;|841|Da||
+|11.1.2|Verify that the application will only process business logic flows with all steps being processed in realistic human time, i.e. transactions are not submitted too quickly.|&check;|&check;|&check;|799|Ne|Nemamo proveru da li se akcije odvijaju previše brzo|
+|11.1.3|Verify the application has appropriate limits for specific business actions or transactions which are correctly enforced on a per user basis.|&check;|&check;|&check;|770|Ne||
+|11.1.4|Verify that the application has anti-automation controls to protect against excessive calls such as mass data exfiltration, business logic requests, file uploads or denial of service attacks.|&check;|&check;|&check;|770|Ne||
+|11.1.5|Verify the application has business logic limits or validation to protect against likely business risks or threats, identified using threat modeling or similar methodologies.|&check;|&check;|&check;|841|Da|Napravili smo threat model|
+|11.1.6|Verify that the application does not suffer from "Time Of Check to Time Of Use" (TOCTOU) issues or other race conditions for sensitive operations.||&check;|&check;|367|Da||
+|11.1.7|Verify that the application monitors for unusual events or activity from a business logic perspective. For example, attempts to perform actions out of order or actions which a normal user would never attempt. (C9)||&check;|&check;|754|Ne||
+|11.1.8|Verify that the application has configurable alerting when automated attacks or unusual activity is detected.||&check;|&check;|390|Ne||
+
+Trebalo bi raditi monitoring tako da možemo da detektujemo kada se akcije ivršavaju previše brzo ili u pogrešnom redosledu.
