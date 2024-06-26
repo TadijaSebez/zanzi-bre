@@ -1,0 +1,1 @@
+{"namespace": "note", "relations": [{"name": "owner", "additional": []}, {"name": "editor", "additional": [{"type": "Union", "children": [{"child": "this"}, {"child": "owner"}]}]}, {"name": "viewer", "additional": [{"type": "Union", "children": [{"child": "this"}, {"child": "editor"}]}]}]}

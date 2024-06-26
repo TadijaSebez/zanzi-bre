@@ -27,8 +27,8 @@ def export_dict(model_dict):
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser(description='Parse a DSL model using a specified grammar.')
-    parser.add_argument('--grammar', type=str, required=True, help='Path to the grammar file')
-    parser.add_argument('--model', type=str, required=True, help='Path to the model file')
+    parser.add_argument('--grammar', type=str, required=False, help='Path to the grammar file', default="grammar.tx")
+    parser.add_argument('--model', type=str, required=False, help='Path to the model file', default="model.ent")
     args = parser.parse_args()
 
     model_str = read_model(args.model)
@@ -36,6 +36,6 @@ if __name__=="__main__":
     model = mm.model_from_str(model_str)
     model_dict = model_to_dict(model)
 
-    #print(json.dumps(model_dict))
+    print(json.dumps(model_dict))
 
     export_dict(model_dict)

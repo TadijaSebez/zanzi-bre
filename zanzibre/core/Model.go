@@ -18,3 +18,7 @@ type Info struct {
 type Child struct {
 	RelationName string `json:"child"`
 }
+
+type Grammar struct {
+	Namespace string `json:"namespace"`
+}
