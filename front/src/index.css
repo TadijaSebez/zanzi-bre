@@ -689,7 +689,9 @@ button:active {
 .regular-border {
 	border: rgba(var(--on-background), 0.2) 2.25px solid;
 }
-
+.disabled-border {
+    border: rgba(var(--on-background), 0.1) 2.25px solid;
+}
 input, textarea {
 	display: block;
 	outline: none;
