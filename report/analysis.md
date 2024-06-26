@@ -514,3 +514,48 @@ Trebalo bi da logujemo i vremena u UTC.
 |7.4.1|Verify that a generic message is shown when an unexpected or security sensitive error occurs, potentially with a unique ID which support personnel can use to investigate. (C10)|&check;|&check;|&check;|210|Ne|Nisu sve greske logovane|
 |7.4.2|Verify that exception handling (or a functional equivalent) is used across the codebase to account for expected and unexpected error conditions. (C10)||&check;|&check;|544|Da|Funkcije vracaju error kao drugu povratnu vrednost|
 |7.4.3|Verify that a "last resort" error handler is defined which will catch all unhandled exceptions. (C10)||&check;|&check;|431|Ne||
+
+
+## V8 Data Protection
+
+### V8.1 General Data Protection
+
+|Identifikator|Opis|L1|L2|L3|CWE|Ispunjeno?||
+|---|---|---|---|---|---|---|---|
+|8.1.1|Verify the application protects sensitive data from being cached in server components such as load balancers and application caches.||&check;|&check;|524|Da|Ne koristimo load balancer|
+|8.1.2|Verify that all cached or temporary copies of sensitive data stored on the server are protected from unauthorized access or purged/invalidated after the authorized user accesses the sensitive data.||&check;|&check;|524|Da||
+|8.1.3|Verify the application minimizes the number of parameters in a request, such as hidden fields, Ajax variables, cookies and header values.||&check;|&check;|233|Da|Broj parametara je minimalan potreban|
+|8.1.4|Verify the application can detect and alert on abnormal numbers of requests, such as by IP, user, total per hour or day, or whatever makes sense for the application.||&check;|&check;|770|Ne||
+|8.1.5|Verify that regular backups of important data are performed and that test restoration of data is performed.|||&check;|19|Ne|Ne pravimo backup|
+|8.1.6|Verify that backups are stored securely to prevent data from being stolen or corrupted.|||&check;|19|Ne||
+
+Trebalo bi da pravimo backup regularno i da iskoristimo npr cloud flare za sprečavanje abnormalnog broja zahteva od istog korisnika.
+
+
+### V8.2 Client-side Data Protection
+
+|Identifikator|Opis|L1|L2|L3|CWE|Ispunjeno?||
+|---|---|---|---|---|---|---|---|
+|8.2.1|Verify the application sets sufficient anti-caching headers so that sensitive data is not cached in modern browsers.|&check;|&check;|&check;|525|Ne|Nismo koristili anti-cashing hedere|
+|8.2.2|Verify that data stored in browser storage (such as localStorage, sessionStorage, IndexedDB, or cookies) does not contain sensitive data.|&check;|&check;|&check;|922|Ne|Čuvamo JWT token u localStorage|
+|8.2.3|Verify that authenticated data is cleared from client storage, such as the browser DOM, after the client or session is terminated.|&check;|&check;|&check;|922|Ne||
+
+Trebalo bi da sprečimo keširanje osetljivih podataka.
+
+
+### V8.3 Sensitive Private Data
+
+|Identifikator|Opis|L1|L2|L3|CWE|Ispunjeno?||
+|---|---|---|---|---|---|---|---|
+|8.3.1|Verify that sensitive data is sent to the server in the HTTP message body or headers, and that query string parameters from any HTTP verb do not contain sensitive data.|&check;|&check;|&check;|319|Da|Query parametri se ne koriste za osetljive podatke|
+|8.3.2|Verify that users have a method to remove or export their data on demand.|&check;|&check;|&check;|212|Ne|Nemamo export podataka, a brisanje je moguće za neke podatke|
+|8.3.3|Verify that users are provided clear language regarding collection and use of supplied personal information and that users have provided opt-in consent for the use of that data before it is used in any way.|&check;|&check;|&check;|285|Ne|Korisnici nisu obavesteni o čuvanju njihovih podataka|
+|8.3.4|Verify that all sensitive data created and processed by the application has been identified, and ensure that a policy is in place on how to deal with sensitive data. (C8)|&check;|&check;|&check;|200|Ne||
+|8.3.5|Verify accessing sensitive data is audited (without logging the sensitive data itself), if the data is collected under relevant data protection directives or where logging of access is required.||&check;|&check;|532|Ne|Nemamo dovoljno logova|
+|8.3.6|Verify that sensitive information contained in memory is overwritten as soon as it is no longer required to mitigate memory dumping attacks, using zeroes or random data.||&check;|&check;|226|Ne||
+|8.3.7|Verify that sensitive or private information that is required to be encrypted, is encrypted using approved algorithms that provide both confidentiality and integrity. (C8)||&check;|&check;|327|Da||
+|8.3.8|Verify that sensitive personal information is subject to data retention classification, such that old or out of date data is deleted automatically, on a schedule, or as the situation requires.||&check;|&check;|285|Ne|Ne brišemo stare podatke automatski|
+
+Trebalo bi da uskladimo naše čuvanje podataka sa GDPR.
+
+
