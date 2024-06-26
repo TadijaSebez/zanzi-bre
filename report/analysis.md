@@ -728,3 +728,59 @@ Trebalo bi obrisati metapodatne iz fajlova koji se uploaduju.
 |13.4.2|Verify that GraphQL or other data layer authorization logic should be implemented at the business logic layer instead of the GraphQL layer||&check;|&check;|285|Da|Ne koristimo GraphQL|
 
 
+## V14 Configuration
+
+### V14.1 Build and Deploy
+
+|Identifikator|Opis|L1|L2|L3|CWE|Ispunjeno?||
+|---|---|---|---|---|---|---|---|
+|14.1.1|Verify that the application build and deployment processes are performed in a secure and repeatable way, such as CI / CD automation, automated configuration management, and automated deployment scripts.||&check;|&check;||Da||
+|14.1.2|Verify that compiler flags are configured to enable all available buffer overflow protections and warnings, including stack randomization, data execution prevention, and to break the build if an unsafe pointer, memory, format string, integer, or string operations are found.||&check;|&check;|120|Da||
+|14.1.3|Verify that server configuration is hardened as per the recommendations of the application server and frameworks in use.||&check;|&check;|16|Da||
+|14.1.4|Verify that the application, configuration, and all dependencies can be redeployed using automated deployment scripts, built from a documented and tested runbook in a reasonable time, or restored from backups in a timely fashion.||&check;|&check;||Ne|Nismo deployovali aplikaciju|
+|14.1.5|Verify that authorized administrators can verify the integrity of all securityrelevant configurations to detect tampering.|||&check;||Da||
+
+
+### V14.2 Dependency
+
+|Identifikator|Opis|L1|L2|L3|CWE|Ispunjeno?||
+|---|---|---|---|---|---|---|---|
+|14.2.1|Verify that all components are up to date, preferably using a dependency checker during build or compile time. (C2)|&check;|&check;|&check;|1026|Da||
+|14.2.2|Verify that all unneeded features, documentation, sample applications and configurations are removed.|&check;|&check;|&check;|1002|Da||
+|14.2.3|Verify that if application assets, such as JavaScript libraries, CSS or web fonts, are hosted externally on a Content Delivery Network (CDN) or external provider, Subresource Integrity (SRI) is used to validate the integrity of the asset.|&check;|&check;|&check;|829|Ne||
+|14.2.4|Verify that third party components come from pre-defined, trusted and continually maintained repositories. (C2)||&check;|&check;|829|Da||
+|14.2.5|Verify that a Software Bill of Materials (SBOM) is maintained of all third party libraries in use. (C2)||&check;|&check;||Ne||
+|14.2.6|Verify that the attack surface is reduced by sandboxing or encapsulating third party libraries to expose only the required behaviour into the application. (C2)||&check;|&check;|265|Ne||
+
+
+### V14.3 Unintended Security Disclosure
+
+|Identifikator|Opis|L1|L2|L3|CWE|Ispunjeno?||
+|---|---|---|---|---|---|---|---|
+|14.3.1|[DELETED, DUPLICATE OF 7.4.1]||||||
+|14.3.2|Verify that web or application server and application framework debug modes are disabled in production to eliminate debug features, developer consoles, and unintended security disclosures.|&check;|&check;|&check;|497|Da||
+|14.3.3|Verify that the HTTP headers or any part of the HTTP response do not expose detailed version information of system components.|&check;|&check;|&check;|200|Da||
+
+
+### V14.4 HTTP Security Headers
+
+|Identifikator|Opis|L1|L2|L3|CWE|Ispunjeno?||
+|---|---|---|---|---|---|---|---|
+|14.4.1|Verify that every HTTP response contains a Content-Type header. Also specify a safe character set (e.g., UTF-8, ISO-8859-1) if the content types are text/*, /+xml and application/xml. Content must match with the provided Content-Type header.|&check;|&check;|&check;|173|Da||
+|14.4.2|Verify that all API responses contain a Content-Disposition: attachment; filename="api.json" header (or other appropriate filename for the content type).|&check;|&check;|&check;|116|Ne||
+|14.4.3|Verify that a Content Security Policy (CSP) response header is in place that helps mitigate impact for XSS attacks like HTML, DOM, JSON, and JavaScript injection vulnerabilities.|&check;|&check;|&check;|1021|Da||
+|14.4.4|Verify that all responses contain a X-Content-Type-Options: nosniff header.|&check;|&check;|&check;|116|Da||
+|14.4.5|Verify that a Strict-Transport-Security header is included on all responses and for all subdomains, such as Strict-Transport-Security: maxage=15724800; includeSubdomains.|&check;|&check;|&check;|523|Ne||
+|14.4.6|Verify that a suitable Referrer-Policy header is included to avoid exposing sensitive information in the URL through the Referer header to untrusted parties.|&check;|&check;|&check;|116|Ne||
+|14.4.7|Verify that the content of a web application cannot be embedded in a thirdparty site by default and that embedding of the exact resources is only allowed where necessary by using suitable Content-Security-Policy: frameancestors and X-Frame-Options response headers.|&check;|&check;|&check;|1021|Da||
+
+
+### V14.5 HTTP Request Header Validation
+
+|Identifikator|Opis|L1|L2|L3|CWE|Ispunjeno?||
+|---|---|---|---|---|---|---|---|
+|14.5.1|Verify that the application server only accepts the HTTP methods in use by the application/API, including pre-flight OPTIONS, and logs/alerts on any requests that are not valid for the application context.|&check;|&check;|&check;|749|Da||
+|14.5.2|Verify that the supplied Origin header is not used for authentication or access control decisions, as the Origin header can easily be changed by an attacker.|&check;|&check;|&check;|346|Da||
+|14.5.3|Verify that the Cross-Origin Resource Sharing (CORS) Access-Control-AllowOrigin header uses a strict allow list of trusted domains and subdomains to match against and does not support the "null" origin.|&check;|&check;|&check;|346|Ne||
+|14.5.4|Verify that HTTP headers added by a trusted proxy or SSO devices, such as a bearer token, are authenticated by the application.||&check;|&check;|306|Da||
+
