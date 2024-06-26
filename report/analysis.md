@@ -282,4 +282,55 @@ Trebalo bi više voditi računa o intraservisnim kredencijalima.
 
 |Identifikator|Opis|L1|L2|L3|CWE|Ispunjeno?||
 |---|---|---|---|---|---|---|---|
+|3.2.1|Verify the application generates a new session token on user authentication. (C6)|&check;|&check;|&check;|384|Da|Pravi se novi JWT token prilikom svake autentifikacije|
+|3.2.2|Verify that session tokens possess at least 64 bits of entropy. (C6)|&check;|&check;|&check;|331|Da||
+|3.2.3|Verify the application only stores session tokens in the browser using secure methods such as appropriately secured cookies (see section 3.4) or HTML 5 session storage.|&check;|&check;|&check;|539|Ne|Koristimo local storage|
+|3.2.4|Verify that session tokens are generated using approved cryptographic algorithms. (C6)||&check;|&check;|331|Da||
+
+
+### V3.3 Session Termination
+
+|Identifikator|Opis|L1|L2|L3|CWE|Ispunjeno?||
+|---|---|---|---|---|---|---|---|
+|3.3.1|Verify that logout and expiration invalidate the session token, such that the back button or a downstream relying party does not resume an authenticated session, including across relying parties. (C6)|&check;|&check;|&check;|613|Da||
+|3.3.2|If authenticators permit users to remain logged in, verify that re-authentication occurs periodically both when actively used or after an idle period. (C6)|&check;|&check;|&check;|613|Ne|Ne koristimo refresh token|
+|3.3.3|Verify that the application gives the option to terminate all other active sessions after a successful password change (including change via password reset/recovery), and that this is effective across the application, federated login (if present), and any relying parties.||&check;|&check;|613|Ne|Nemamo ovu opciju|
+|3.3.4|Verify that users are able to view and (having re-entered login credentials) log out of any or all currently active sessions and devices.||&check;|&check;|613|Da||
+
+
+### V3.4 Cookie-based Session Management
+
+|Identifikator|Opis|L1|L2|L3|CWE|Ispunjeno?||
+|---|---|---|---|---|---|---|---|
+|3.4.1|Verify that cookie-based session tokens have the 'Secure' attribute set. (C6)|&check;|&check;|&check;|614|Ne|Ne koristimo cookie|
+|3.4.2|Verify that cookie-based session tokens have the 'HttpOnly' attribute set. (C6)|&check;|&check;|&check;|1004|Ne||
+|3.4.3|Verify that cookie-based session tokens utilize the 'SameSite' attribute to limit exposure to cross-site request forgery attacks. (C6)|&check;|&check;|&check;|16|Ne||
+|3.4.4|Verify that cookie-based session tokens use the "__Host-" prefix so cookies are only sent to the host that initially set the cookie.|&check;|&check;|&check;|16|Ne||
+|3.4.5|Verify that if the application is published under a domain name with other applications that set or use session cookies that might disclose the session cookies, set the path attribute in cookie-based session tokens using the most precise path possible. (C6)|&check;|&check;|&check;|16|Ne||
+
+
+### V3.5 Token-based Session Management
+
+|Identifikator|Opis|L1|L2|L3|CWE|Ispunjeno?||
+|---|---|---|---|---|---|---|---|
+|3.5.1|Verify the application allows users to revoke OAuth tokens that form trust relationships with linked applications.||&check;|&check;|290|Ne|Nemamo OAuth|
+|3.5.2|Verify the application uses session tokens rather than static API secrets and keys, except with legacy implementations.||&check;|&check;|798|Da|Koristimo JWT|
+|3.5.3|Verify that stateless session tokens use digital signatures, encryption, and other countermeasures to protect against tampering, enveloping, replay, null cipher, and key substitution attacks.||&check;|&check;|345|Da|Koristimo JWT|
+
+Mogli bismo dodati i OAuth kao mogući način autentifikacije.
+
+
+### V3.6 Federated Re-authentication
+
+|Identifikator|Opis|L1|L2|L3|CWE|Ispunjeno?||
+|---|---|---|---|---|---|---|---|
+|3.6.1|Verify that Relying Parties (RPs) specify the maximum authentication time to Credential Service Providers (CSPs) and that CSPs reauthenticate the user if they haven't used a session within that period.|||&check;|613|Ne||
+|3.6.2|Verify that Credential Service Providers (CSPs) inform Relying Parties (RPs) of the last authentication event, to allow RPs to determine if they need to re-authenticate the user.|||&check;|613|Ne||
+
+
+### V3.7 Defenses Against Session Management Exploits
+
+|Identifikator|Opis|L1|L2|L3|CWE|Ispunjeno?||
+|---|---|---|---|---|---|---|---|
+|3.7.1|Verify the application ensures a full, valid login session or requires reauthentication or secondary verification before allowing any sensitive transactions or account modifications.|&check;|&check;|&check;|306|Da|Nema senzitivnih transakcija|
 
