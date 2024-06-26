@@ -426,3 +426,47 @@ Mogli bismo dodati i OAuth kao mogući način autentifikacije.
 |5.5.3|Verify that deserialization of untrusted data is avoided or is protected in both custom code and third-party libraries (such as JSON, XML and YAML parsers).|&check;|&check;|&check;|502|Da||
 |5.5.4|Verify that when parsing JSON in browsers or JavaScript-based backends, JSON.parse is used to parse the JSON document. Do not use eval() to parse JSON.|&check;|&check;|&check;|95|Da|Ne koristimo eval|
 
+
+## V6 Stored Cryptography
+
+### V6.1 Data Classification
+
+|Identifikator|Opis|L1|L2|L3|CWE|Ispunjeno?||
+|---|---|---|---|---|---|---|---|
+|6.1.1|Verify that regulated private data is stored encrypted while at rest, such as Personally Identifiable Information (PII), sensitive personal information, or data assessed likely to be subject to EU's GDPR.||&check;|&check;|311|Ne|Ne čuvamo takve informacije|
+|6.1.2|Verify that regulated health data is stored encrypted while at rest, such as medical records, medical device details, or de-anonymized research records.||&check;|&check;|311|Ne||
+|6.1.3|Verify that regulated financial data is stored encrypted while at rest, such as financial accounts, defaults or credit history, tax records, pay history, beneficiaries, or de-anonymized market or research records.||&check;|&check;|311|Ne||
+
+
+### V6.2 Algorithms
+
+|Identifikator|Opis|L1|L2|L3|CWE|Ispunjeno?||
+|---|---|---|---|---|---|---|---|
+|6.2.1|Verify that all cryptographic modules fail securely, and errors are handled in a way that does not enable Padding Oracle attacks.|&check;|&check;|&check;|310|Da||
+|6.2.2|Verify that industry proven or government approved cryptographic algorithms, modes, and libraries are used, instead of custom coded cryptography. (C8)||&check;|&check;|327|Da||
+|6.2.3|Verify that encryption initialization vector, cipher configuration, and block modes are configured securely using the latest advice.||&check;|&check;|326|Ne||
+|6.2.4|Verify that random number, encryption or hashing algorithms, key lengths, rounds, ciphers or modes, can be reconfigured, upgraded, or swapped at any time, to protect against cryptographic breaks. (C8)||&check;|&check;|326|Ne|Nije lako zameniti algoritam|
+|6.2.5|Verify that known insecure block modes (i.e. ECB, etc.), padding modes (i.e. PKCS#1 v1.5, etc.), ciphers with small block sizes (i.e. Triple-DES, Blowfish, etc.), and weak hashing algorithms (i.e. MD5, SHA1, etc.) are not used unless required for backwards compatibility.||&check;|&check;|326|Da||
+|6.2.6|Verify that nonces, initialization vectors, and other single use numbers must not be used more than once with a given encryption key. The method of generation must be appropriate for the algorithm being used.||&check;|&check;|326|Da||
+|6.2.7|Verify that encrypted data is authenticated via signatures, authenticated cipher modes, or HMAC to ensure that ciphertext is not altered by an unauthorized party.|||&check;|326|Da|JWT tokeni su potpisani|
+|6.2.8|Verify that all cryptographic operations are constant-time, with no 'short-circuit' operations in comparisons, calculations, or returns, to avoid leaking information.|||&check;|385|Da||
+
+Trebalo bi omogućiti laku zamenu kriptografskih algoritama.
+
+
+### V6.3 Random Values
+
+|Identifikator|Opis|L1|L2|L3|CWE|Ispunjeno?||
+|---|---|---|---|---|---|---|---|
+|6.3.1|Verify that all random numbers, random file names, random GUIDs, and random strings are generated using the cryptographic module's approved cryptographically secure random number generator when these random values are intended to be not guessable by an attacker.||&check;|&check;|338|Da|Kriptografske biblioteke koriste secure random number generator|
+|6.3.2|Verify that random GUIDs are created using the GUID v4 algorithm, and a Cryptographically-secure Pseudo-random Number Generator (CSPRNG). GUIDs created using other pseudo-random number generators may be predictable.||&check;|&check;|338|Ne|Ne generišemo GUID|
+|6.3.3|Verify that random numbers are created with proper entropy even when the application is under heavy load, or that the application degrades gracefully in such circumstances.|||&check;|338|Ne||
+
+
+### V6.4 Secret Management
+
+|Identifikator|Opis|L1|L2|L3|CWE|Ispunjeno?||
+|---|---|---|---|---|---|---|---|
+|6.4.1|Verify that a secrets management solution such as a key vault is used to securely create, store, control access to and destroy secrets. (C8)||&check;|&check;|798|Ne|Nismo koristili key vault|
+|6.4.2|Verify that key material is not exposed to the application but instead uses an isolated security module like a vault for cryptographic operations. (C8)||&check;|&check;|320|Ne||
+
